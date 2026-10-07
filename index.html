@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#15203b" />
+    <meta name="description" content="生成AIパスポート試験の個人学習用問題サイト" />
+    <title>生成AIパスポート｜一発合格トレーニング 2026</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2315203b'/%3E%3Cpath d='M18 19h28v27H18z' fill='none' stroke='%23fff' stroke-width='5'/%3E%3Cpath d='m24 33 6 6 12-15' fill='none' stroke='%23ffb547' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <style>
+:root {
+  color-scheme: light;
+  --ink: #172038;
+  --muted: #65708a;
+  --navy: #15203b;
+  --navy-2: #23345d;
+  --paper: #ffffff;
+  --ground: #f1f4f9;
+  --line: #dce2ed;
+  --accent: #f3a83b;
+  --accent-dark: #bd6e08;
+  --blue: #4767d8;
+  --blue-soft: #edf1ff;
+  --green: #128066;
+  --green-soft: #e7f7f1;
+  --red: #c74646;
+  --red-soft: #fff0f0;
+  --shadow: 0 18px 50px rgba(21, 32, 59, 0.1);
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--ground); }
+body { margin: 0; min-width: 320px; color: var(--ink); background: var(--ground); }
+button, select { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid rgba(71, 103, 216, .35); outline-offset: 3px; }
+
+/* 簡易パスワード画面（GitHub Pages向け・本格的なアクセス制御ではありません） */
+#passwordGate { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: linear-gradient(145deg, #15203b, #23345d); }
+#passwordGate[hidden] { display: none; }
+.password-card { width: min(100%, 420px); padding: 34px; border-radius: 20px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.28); }
+.password-card h1 { font-size: 1.55rem; margin-bottom: 8px; }
+.password-card p { color: #65708a; line-height: 1.7; }
+.password-card label { display: block; margin: 22px 0 8px; font-weight: 700; }
+.password-card input { width: 100%; padding: 13px 14px; border: 1px solid #cbd3e1; border-radius: 10px; font: inherit; }
+.password-card button { width: 100%; margin-top: 14px; padding: 13px 16px; border: 0; border-radius: 10px; background: #15203b; color: #fff; font-weight: 800; }
+.password-error { min-height: 1.5em; margin: 10px 0 0; color: #c74646; font-size: .88rem; }
+
+.topbar {
+  min-height: 74px; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px max(20px, calc((100vw - 1120px) / 2)); background: var(--navy); color: white;
+  position: sticky; top: 0; z-index: 20; box-shadow: 0 8px 24px rgba(11, 18, 36, .18);
+}
+.brand { display: flex; align-items: center; gap: 12px; color: inherit; background: none; border: 0; padding: 0; text-align: left; }
+.brand-mark { width: 42px; height: 42px; display: grid; place-items: center; background: var(--accent); color: var(--navy); font-weight: 900; border-radius: 12px 5px 12px 5px; }
+.brand b, .brand small { display: block; }
+.brand b { font-size: 1rem; letter-spacing: .02em; }
+.brand small { margin-top: 2px; color: #bfc9e1; font-size: .76rem; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.saved-note { color: #c7d0e5; font-size: .78rem; }
+.icon-button { min-width: 40px; min-height: 40px; border: 1px solid rgba(255,255,255,.25); border-radius: 10px; color: inherit; background: rgba(255,255,255,.08); font-size: 1.3rem; }
+
+#app { max-width: 1120px; margin: 0 auto; padding: 34px 20px 72px; }
+.eyebrow { color: var(--blue); font-weight: 800; font-size: .75rem; letter-spacing: .16em; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: clamp(1.75rem, 5vw, 3rem); line-height: 1.2; letter-spacing: -.035em; margin-bottom: 12px; }
+h2 { font-size: clamp(1.35rem, 3vw, 1.8rem); line-height: 1.35; margin-bottom: 10px; }
+h3 { font-size: 1.05rem; margin-bottom: 6px; }
+.lead { max-width: 680px; color: var(--muted); line-height: 1.8; font-size: 1rem; }
+.home-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.goal-chip { flex: 0 0 auto; border: 1px solid #ffd18e; background: #fff8e9; color: #8b5204; padding: 12px 16px; border-radius: 14px; font-weight: 750; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0 30px; }
+.stat-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: 0 5px 20px rgba(21,32,59,.04); }
+.stat-card span { display: block; color: var(--muted); font-size: .82rem; }
+.stat-card strong { display: block; font-size: 1.75rem; margin-top: 4px; letter-spacing: -.04em; }
+.stat-card strong small { font-size: .8rem; color: var(--muted); letter-spacing: 0; }
+
+.section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 34px 0 14px; }
+.section-title h2 { margin: 0; }
+.section-title span { color: var(--muted); font-size: .84rem; }
+.mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.mode-card { min-height: 192px; text-align: left; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); color: var(--ink); box-shadow: 0 6px 24px rgba(21,32,59,.05); transition: transform .18s, border-color .18s, box-shadow .18s; }
+.mode-card:hover { transform: translateY(-3px); border-color: #aebbe2; box-shadow: var(--shadow); }
+.mode-card.primary { color: white; border-color: var(--navy); background: linear-gradient(145deg, var(--navy), var(--navy-2)); }
+.mode-card.primary p { color: #c8d1e6; }
+.mode-card .mode-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: var(--blue-soft); color: var(--blue); font-weight: 900; margin-bottom: 26px; }
+.mode-card.primary .mode-icon { background: rgba(255,255,255,.12); color: var(--accent); }
+.mode-card p { color: var(--muted); line-height: 1.6; margin: 0; font-size: .9rem; }
+.mode-card .card-link { display: block; margin-top: 14px; color: var(--blue); font-weight: 750; }
+.mode-card.primary .card-link { color: var(--accent); }
+
+.chapter-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.chapter-button { text-align: left; border: 1px solid var(--line); background: var(--paper); border-radius: 14px; padding: 16px; color: var(--ink); }
+.chapter-button:hover { border-color: var(--blue); }
+.chapter-button b { display: block; margin-bottom: 5px; }
+.chapter-button span { color: var(--muted); font-size: .78rem; }
+.chapter-meter { height: 5px; margin-top: 14px; border-radius: 99px; background: #e6eaf2; overflow: hidden; }
+.chapter-meter i { display: block; height: 100%; background: var(--blue); border-radius: inherit; }
+
+.quiz-shell { max-width: 820px; margin: 0 auto; }
+.quiz-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; }
+.quiz-status { color: var(--muted); font-size: .9rem; }
+.timer { min-width: 96px; text-align: center; padding: 9px 12px; border-radius: 10px; background: var(--navy); color: white; font-weight: 800; font-variant-numeric: tabular-nums; }
+.timer.warning { background: var(--red); }
+.progress-track { height: 7px; background: #dfe4ed; border-radius: 99px; overflow: hidden; margin-bottom: 22px; }
+.progress-track i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), #7790e8); transition: width .25s; }
+.question-card { background: var(--paper); border: 1px solid var(--line); border-radius: 22px; padding: clamp(22px, 5vw, 38px); box-shadow: var(--shadow); }
+.question-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+.tag { display: inline-flex; align-items: center; min-height: 27px; padding: 4px 9px; border-radius: 7px; background: #eef1f6; color: #58647c; font-size: .73rem; font-weight: 700; }
+.tag.chapter { background: var(--navy); color: white; }
+.question-text { white-space: pre-line; font-size: clamp(1.08rem, 3vw, 1.3rem); line-height: 1.75; font-weight: 700; margin-bottom: 24px; }
+.choices { display: grid; gap: 11px; }
+.choice { width: 100%; display: flex; align-items: flex-start; gap: 13px; text-align: left; color: var(--ink); background: white; border: 1.5px solid #d7ddea; border-radius: 13px; padding: 15px 16px; line-height: 1.6; }
+.choice:hover:not(:disabled) { border-color: #8799d5; background: #f8f9ff; }
+.choice.selected { border-color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 1px var(--blue); }
+.choice.correct { border-color: var(--green); background: var(--green-soft); }
+.choice.wrong { border-color: var(--red); background: var(--red-soft); }
+.choice:disabled { cursor: default; opacity: 1; }
+.choice-number { flex: 0 0 29px; height: 29px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 8px; font-weight: 800; font-size: .82rem; }
+.choice.selected .choice-number { background: var(--blue); color: white; border-color: var(--blue); }
+.choice.correct .choice-number { background: var(--green); color: white; border-color: var(--green); }
+.choice.wrong .choice-number { background: var(--red); color: white; border-color: var(--red); }
+
+.answer-panel { margin-top: 22px; padding: 20px; border-left: 5px solid var(--green); border-radius: 4px 13px 13px 4px; background: var(--green-soft); }
+.answer-panel.incorrect { border-color: var(--red); background: var(--red-soft); }
+.answer-panel h3 { color: var(--green); }
+.answer-panel.incorrect h3 { color: var(--red); }
+.answer-panel p { line-height: 1.75; margin-bottom: 12px; }
+.source-link { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-size: .85rem; font-weight: 700; }
+.source-note { display: block; color: var(--muted); font-size: .74rem; margin-top: 5px; }
+.quiz-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; }
+.action-right { display: flex; gap: 10px; margin-left: auto; }
+.primary-button, .secondary-button, .danger-button { min-height: 46px; border-radius: 11px; padding: 10px 18px; font-weight: 800; }
+.primary-button { border: 1px solid var(--navy); background: var(--navy); color: white; }
+.primary-button:hover { background: var(--navy-2); }
+.primary-button:disabled { opacity: .42; cursor: not-allowed; }
+.secondary-button { border: 1px solid var(--line); background: white; color: var(--ink); }
+.secondary-button.active { border-color: var(--accent-dark); color: #8b5204; background: #fff8e9; }
+.danger-button { border: 1px solid #f0b4b4; background: var(--red-soft); color: #9b3030; width: 100%; }
+
+.result-wrap { max-width: 880px; margin: 0 auto; }
+.result-hero { text-align: center; background: var(--navy); color: white; border-radius: 24px; padding: 38px 24px; box-shadow: var(--shadow); }
+.result-hero .eyebrow { color: var(--accent); }
+.score-ring { width: 150px; height: 150px; display: grid; place-items: center; margin: 24px auto; border-radius: 50%; background: conic-gradient(var(--accent) var(--score), rgba(255,255,255,.14) 0); position: relative; }
+.score-ring::before { content: ""; position: absolute; inset: 11px; border-radius: 50%; background: var(--navy); }
+.score-ring strong { position: relative; font-size: 2.2rem; }
+.score-ring small { font-size: .85rem; color: #c8d1e6; }
+.result-hero p { color: #ccd4e7; }
+.result-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.result-hero .secondary-button { background: transparent; color: white; border-color: rgba(255,255,255,.35); }
+.result-list { margin-top: 20px; display: grid; gap: 9px; }
+.result-row { display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); background: white; border-radius: 12px; }
+.result-row .ok { color: var(--green); font-weight: 800; }
+.result-row .ng { color: var(--red); font-weight: 800; }
+.empty-card { text-align: center; background: white; border: 1px solid var(--line); border-radius: 20px; padding: 48px 24px; }
+
+dialog { width: min(92vw, 460px); border: 0; border-radius: 18px; padding: 0; box-shadow: 0 30px 90px rgba(7,14,32,.28); }
+dialog::backdrop { background: rgba(9,15,30,.58); backdrop-filter: blur(3px); }
+.dialog-card { padding: 24px; }
+.dialog-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.dialog-head .icon-button { color: var(--ink); border-color: var(--line); background: white; }
+.dialog-card p { color: var(--muted); line-height: 1.7; }
+
+@media (max-width: 820px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .mode-grid { grid-template-columns: 1fr; }
+  .mode-card { min-height: 0; }
+  .mode-card .mode-icon { margin-bottom: 18px; }
+  .chapter-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .topbar { min-height: 64px; padding: 10px 14px; }
+  .brand b { font-size: .9rem; }
+  .brand small, .saved-note { display: none; }
+  .brand-mark { width: 38px; height: 38px; }
+  #app { padding: 24px 14px 56px; }
+  .home-intro { display: block; }
+  .goal-chip { display: inline-block; margin-top: 8px; }
+  .stats-grid { gap: 8px; }
+  .stat-card { padding: 14px; }
+  .stat-card strong { font-size: 1.45rem; }
+  .chapter-grid { grid-template-columns: 1fr; }
+  .quiz-toolbar { align-items: flex-start; }
+  .question-card { border-radius: 17px; }
+  .choice { padding: 13px; }
+  .quiz-actions { align-items: stretch; flex-direction: column; }
+  .action-right { width: 100%; }
+  .action-right > * { flex: 1; }
+  .result-row { grid-template-columns: 52px 1fr; }
+  .result-row > :last-child { grid-column: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+
+</style>
+  </head>
+  <body>
+    <section id="passwordGate" aria-labelledby="passwordTitle">
+      <form class="password-card" id="passwordForm">
+        <span class="eyebrow">PRIVATE STUDY SITE</span>
+        <h1 id="passwordTitle">パスワードを入力</h1>
+        <p>この学習サイトを開くには、設定したパスワードが必要です。</p>
+        <label for="passwordInput">パスワード</label>
+        <input id="passwordInput" type="password" autocomplete="current-password" required autofocus />
+        <button type="submit">サイトを開く</button>
+        <p class="password-error" id="passwordError" role="alert" aria-live="polite"></p>
+      </form>
+    </section>
+    <script>
+      (() => {
+        // パスワードを変える場合は、右側の文字だけを書き換えてください。
+        const sitePassword = "GenAI-Passport-2026!";
+        const unlockedKey = "genai-passport-unlocked";
+        const gate = document.getElementById("passwordGate");
+        const form = document.getElementById("passwordForm");
+        const input = document.getElementById("passwordInput");
+        const error = document.getElementById("passwordError");
+
+        if (sessionStorage.getItem(unlockedKey) === "true") gate.hidden = true;
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          if (input.value === sitePassword) {
+            sessionStorage.setItem(unlockedKey, "true");
+            gate.hidden = true;
+            input.value = "";
+          } else {
+            error.textContent = "パスワードが違います。";
+            input.select();
+          }
+        });
+      })();
+    </script>
+    <header class="topbar">
+      <button class="brand" id="homeButton" type="button" aria-label="ホームへ戻る">
+        <span class="brand-mark" aria-hidden="true">AI</span>
+        <span><b>一発合格トレーニング</b><small>生成AIパスポート 2026</small></span>
+      </button>
+      <div class="topbar-actions">
+        <span class="saved-note" id="savedNote">この端末に自動保存</span>
+        <button class="icon-button" id="settingsButton" type="button" aria-label="設定を開く" title="設定">⋯</button>
+      </div>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+
+    <dialog id="settingsDialog">
+      <form method="dialog" class="dialog-card">
+        <div class="dialog-head">
+          <div><span class="eyebrow">SETTINGS</span><h2>学習データ</h2></div>
+          <button class="icon-button" value="cancel" aria-label="閉じる">×</button>
+        </div>
+        <p>回答履歴と要復習リストは、この端末のブラウザ内だけに保存されます。</p>
+        <button class="danger-button" id="resetButton" type="button">学習データをすべて消去</button>
+      </form>
+    </dialog>
+
+    <noscript>このサイトを利用するにはJavaScriptを有効にしてください。</noscript>
+    <script>
+window.QUESTION_BANK=[{"id":"Q001","chapter":"第1章","section":"AIの定義","topic":"AI（人工知能）","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称」","choices":["強化学習","ディープラーニング","AI（人工知能）","ダートマス会議"],"answer":3,"explanation":"AI（人工知能）：人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q002","chapter":"第1章","section":"AIの定義","topic":"AI（人工知能）","format":"用語→定義","difficulty":"標準","question":"「AI（人工知能）」の説明として最も適切なものを選んでください。","choices":["1956年に開催され「Artificial Intelligence」という語が学術的に広まる契機となった会議","行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","多数の層を持つニューラルネットワークを用いる機械学習手法","人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称"],"answer":4,"explanation":"AI（人工知能）：人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q003","chapter":"第1章","section":"AIの定義","topic":"ダートマス会議","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「1956年に開催され「Artificial Intelligence」という語が学術的に広まる契機となった会議」","choices":["ドロップアウト","ダートマス会議","教師あり学習","ニューラルネットワーク"],"answer":2,"explanation":"ダートマス会議：1956年に開催され「Artificial Intelligence」という語が学術的に広まる契機となった会議","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q004","chapter":"第1章","section":"AIの定義","topic":"ダートマス会議","format":"用語→定義","difficulty":"基礎","question":"「ダートマス会議」の説明として最も適切なものを選んでください。","choices":["1956年に開催され「Artificial Intelligence」という語が学術的に広まる契機となった会議","人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","学習時に一部のノードをランダムに無効化して過学習を抑える手法","入力データと正解ラベルの組を使って学習する手法"],"answer":1,"explanation":"ダートマス会議：1956年に開催され「Artificial Intelligence」という語が学術的に広まる契機となった会議","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q005","chapter":"第1章","section":"知能をもたらす仕組み","topic":"ルールベース","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「人があらかじめ定めた条件と処理の規則に従って判断する方式」","choices":["ルールベース","クラスタリング","正則化","AGI（強いAI）"],"answer":1,"explanation":"ルールベース：人があらかじめ定めた条件と処理の規則に従って判断する方式","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q006","chapter":"第1章","section":"知能をもたらす仕組み","topic":"ルールベース","format":"用語→定義","difficulty":"基礎","question":"「ルールベース」の説明として最も適切なものを選んでください。","choices":["似た特徴を持つデータを自動的にグループ化する教師なし学習の代表的手法","人があらかじめ定めた条件と処理の規則に従って判断する方式","人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI","モデルの複雑さに制約を加えるなどして過学習を抑える手法"],"answer":2,"explanation":"ルールベース：人があらかじめ定めた条件と処理の規則に従って判断する方式","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q007","chapter":"第1章","section":"知能をもたらす仕組み","topic":"機械学習","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「データから規則性を学び予測や分類などを行う技術」","choices":["ディープラーニング","ANI（弱いAI）","AI（人工知能）","機械学習"],"answer":4,"explanation":"機械学習：データから規則性を学び予測や分類などを行う技術","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q008","chapter":"第1章","section":"知能をもたらす仕組み","topic":"機械学習","format":"用語→定義","difficulty":"基礎","question":"「機械学習」の説明として最も適切なものを選んでください。","choices":["特定の限定された課題に特化して能力を発揮するAI","多数の層を持つニューラルネットワークを用いる機械学習手法","データから規則性を学び予測や分類などを行う技術","人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称"],"answer":3,"explanation":"機械学習：データから規則性を学び予測や分類などを行う技術","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q009","chapter":"第1章","section":"機械学習の手法","topic":"教師あり学習","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「入力データと正解ラベルの組を使って学習する手法」","choices":["教師あり学習","シンギュラリティ","機械学習","ドロップアウト"],"answer":1,"explanation":"教師あり学習：入力データと正解ラベルの組を使って学習する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q010","chapter":"第1章","section":"機械学習の手法","topic":"教師あり学習","format":"用語→定義","difficulty":"標準","question":"「教師あり学習」の説明として最も適切なものを選んでください。","choices":["AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念","データから規則性を学び予測や分類などを行う技術","学習時に一部のノードをランダムに無効化して過学習を抑える手法","入力データと正解ラベルの組を使って学習する手法"],"answer":4,"explanation":"教師あり学習：入力データと正解ラベルの組を使って学習する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q011","chapter":"第1章","section":"機械学習の手法","topic":"教師なし学習","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「正解ラベルのないデータから構造やパターンを発見する手法」","choices":["AGI（強いAI）","教師なし学習","クラスタリング","ルールベース"],"answer":2,"explanation":"教師なし学習：正解ラベルのないデータから構造やパターンを発見する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q012","chapter":"第1章","section":"機械学習の手法","topic":"教師なし学習","format":"用語→定義","difficulty":"基礎","question":"「教師なし学習」の説明として最も適切なものを選んでください。","choices":["正解ラベルのないデータから構造やパターンを発見する手法","似た特徴を持つデータを自動的にグループ化する教師なし学習の代表的手法","人があらかじめ定めた条件と処理の規則に従って判断する方式","人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI"],"answer":1,"explanation":"教師なし学習：正解ラベルのないデータから構造やパターンを発見する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q013","chapter":"第1章","section":"機械学習の手法","topic":"強化学習","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法」","choices":["教師なし学習","AI（人工知能）","強化学習","ディープラーニング"],"answer":3,"explanation":"強化学習：行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q014","chapter":"第1章","section":"機械学習の手法","topic":"強化学習","format":"用語→定義","difficulty":"基礎","question":"「強化学習」の説明として最も適切なものを選んでください。","choices":["人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称","多数の層を持つニューラルネットワークを用いる機械学習手法","行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","正解ラベルのないデータから構造やパターンを発見する手法"],"answer":3,"explanation":"強化学習：行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q015","chapter":"第1章","section":"機械学習の手法","topic":"クラスタリング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「似た特徴を持つデータを自動的にグループ化する教師なし学習の代表的手法」","choices":["ニューラルネットワーク","ドロップアウト","機械学習","クラスタリング"],"answer":4,"explanation":"クラスタリング：似た特徴を持つデータを自動的にグループ化する教師なし学習の代表的手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q016","chapter":"第1章","section":"機械学習の手法","topic":"クラスタリング","format":"用語→定義","difficulty":"基礎","question":"「クラスタリング」の説明として最も適切なものを選んでください。","choices":["似た特徴を持つデータを自動的にグループ化する教師なし学習の代表的手法","人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","データから規則性を学び予測や分類などを行う技術","学習時に一部のノードをランダムに無効化して過学習を抑える手法"],"answer":1,"explanation":"クラスタリング：似た特徴を持つデータを自動的にグループ化する教師なし学習の代表的手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q017","chapter":"第1章","section":"機械学習の手法","topic":"次元削減","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「重要な情報をなるべく保ちながら特徴量の数を減らす手法」","choices":["次元削減","AGI（強いAI）","正則化","強化学習"],"answer":1,"explanation":"次元削減：重要な情報をなるべく保ちながら特徴量の数を減らす手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q018","chapter":"第1章","section":"機械学習の手法","topic":"次元削減","format":"用語→定義","difficulty":"標準","question":"「次元削減」の説明として最も適切なものを選んでください。","choices":["行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI","モデルの複雑さに制約を加えるなどして過学習を抑える手法","重要な情報をなるべく保ちながら特徴量の数を減らす手法"],"answer":4,"explanation":"次元削減：重要な情報をなるべく保ちながら特徴量の数を減らす手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q019","chapter":"第1章","section":"ニューラルネットワーク","topic":"ニューラルネットワーク","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「人工ニューロンを層状に接続し重みを調整して情報を処理するモデル」","choices":["ディープラーニング","AI（人工知能）","ニューラルネットワーク","ANI（弱いAI）"],"answer":3,"explanation":"ニューラルネットワーク：人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q020","chapter":"第1章","section":"ニューラルネットワーク","topic":"ニューラルネットワーク","format":"用語→定義","difficulty":"基礎","question":"「ニューラルネットワーク」の説明として最も適切なものを選んでください。","choices":["特定の限定された課題に特化して能力を発揮するAI","人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称","人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","多数の層を持つニューラルネットワークを用いる機械学習手法"],"answer":3,"explanation":"ニューラルネットワーク：人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q021","chapter":"第1章","section":"ニューラルネットワーク","topic":"ディープラーニング","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「多数の層を持つニューラルネットワークを用いる機械学習手法」","choices":["ディープラーニング","シンギュラリティ","ドロップアウト","機械学習"],"answer":1,"explanation":"ディープラーニング：多数の層を持つニューラルネットワークを用いる機械学習手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q022","chapter":"第1章","section":"ニューラルネットワーク","topic":"ディープラーニング","format":"用語→定義","difficulty":"基礎","question":"「ディープラーニング」の説明として最も適切なものを選んでください。","choices":["データから規則性を学び予測や分類などを行う技術","多数の層を持つニューラルネットワークを用いる機械学習手法","学習時に一部のノードをランダムに無効化して過学習を抑える手法","AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念"],"answer":2,"explanation":"ディープラーニング：多数の層を持つニューラルネットワークを用いる機械学習手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q023","chapter":"第1章","section":"過学習","topic":"過学習","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「訓練データに適合しすぎ未知データに対する性能が低下した状態」","choices":["AGI（強いAI）","強化学習","ルールベース","過学習"],"answer":4,"explanation":"過学習：訓練データに適合しすぎ未知データに対する性能が低下した状態","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q024","chapter":"第1章","section":"過学習","topic":"過学習","format":"用語→定義","difficulty":"基礎","question":"「過学習」の説明として最も適切なものを選んでください。","choices":["訓練データに適合しすぎ未知データに対する性能が低下した状態","人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI","人があらかじめ定めた条件と処理の規則に従って判断する方式","行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法"],"answer":1,"explanation":"過学習：訓練データに適合しすぎ未知データに対する性能が低下した状態","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q025","chapter":"第1章","section":"過学習対策","topic":"正則化","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「モデルの複雑さに制約を加えるなどして過学習を抑える手法」","choices":["教師なし学習","ニューラルネットワーク","正則化","AI（人工知能）"],"answer":3,"explanation":"正則化：モデルの複雑さに制約を加えるなどして過学習を抑える手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q026","chapter":"第1章","section":"過学習対策","topic":"正則化","format":"用語→定義","difficulty":"標準","question":"「正則化」の説明として最も適切なものを選んでください。","choices":["人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称","正解ラベルのないデータから構造やパターンを発見する手法","人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","モデルの複雑さに制約を加えるなどして過学習を抑える手法"],"answer":4,"explanation":"正則化：モデルの複雑さに制約を加えるなどして過学習を抑える手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q027","chapter":"第1章","section":"過学習対策","topic":"ドロップアウト","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「学習時に一部のノードをランダムに無効化して過学習を抑える手法」","choices":["正則化","ドロップアウト","機械学習","次元削減"],"answer":2,"explanation":"ドロップアウト：学習時に一部のノードをランダムに無効化して過学習を抑える手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q028","chapter":"第1章","section":"過学習対策","topic":"ドロップアウト","format":"用語→定義","difficulty":"基礎","question":"「ドロップアウト」の説明として最も適切なものを選んでください。","choices":["学習時に一部のノードをランダムに無効化して過学習を抑える手法","重要な情報をなるべく保ちながら特徴量の数を減らす手法","モデルの複雑さに制約を加えるなどして過学習を抑える手法","データから規則性を学び予測や分類などを行う技術"],"answer":1,"explanation":"ドロップアウト：学習時に一部のノードをランダムに無効化して過学習を抑える手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q029","chapter":"第1章","section":"転移学習","topic":"転移学習","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「別の課題で学習済みのモデルを新しい課題に活用する手法」","choices":["転移学習","強化学習","過学習","AGI（強いAI）"],"answer":1,"explanation":"転移学習：別の課題で学習済みのモデルを新しい課題に活用する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q030","chapter":"第1章","section":"転移学習","topic":"転移学習","format":"用語→定義","difficulty":"基礎","question":"「転移学習」の説明として最も適切なものを選んでください。","choices":["行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","別の課題で学習済みのモデルを新しい課題に活用する手法","人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI","訓練データに適合しすぎ未知データに対する性能が低下した状態"],"answer":2,"explanation":"転移学習：別の課題で学習済みのモデルを新しい課題に活用する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q031","chapter":"第1章","section":"AIの種類","topic":"ANI（弱いAI）","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「特定の限定された課題に特化して能力を発揮するAI」","choices":["ニューラルネットワーク","転移学習","AI（人工知能）","ANI（弱いAI）"],"answer":4,"explanation":"ANI（弱いAI）：特定の限定された課題に特化して能力を発揮するAI","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q032","chapter":"第1章","section":"AIの種類","topic":"ANI（弱いAI）","format":"用語→定義","difficulty":"基礎","question":"「ANI（弱いAI）」の説明として最も適切なものを選んでください。","choices":["別の課題で学習済みのモデルを新しい課題に活用する手法","人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","特定の限定された課題に特化して能力を発揮するAI","人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称"],"answer":3,"explanation":"ANI（弱いAI）：特定の限定された課題に特化して能力を発揮するAI","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q033","chapter":"第1章","section":"AIの種類","topic":"AGI（強いAI）","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI」","choices":["AGI（強いAI）","シンギュラリティ","機械学習","正則化"],"answer":1,"explanation":"AGI（強いAI）：人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q034","chapter":"第1章","section":"AIの種類","topic":"AGI（強いAI）","format":"用語→定義","difficulty":"標準","question":"「AGI（強いAI）」の説明として最も適切なものを選んでください。","choices":["AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念","データから規則性を学び予測や分類などを行う技術","モデルの複雑さに制約を加えるなどして過学習を抑える手法","人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI"],"answer":4,"explanation":"AGI（強いAI）：人間のように幅広い課題へ汎用的に対応できる知能として想定されるAI","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q035","chapter":"第1章","section":"AIの歴史","topic":"エキスパートシステム","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「専門家の知識を規則として蓄積し推論する第二次AIブームを代表するシステム」","choices":["ANI（弱いAI）","エキスパートシステム","強化学習","ルールベース"],"answer":2,"explanation":"エキスパートシステム：専門家の知識を規則として蓄積し推論する第二次AIブームを代表するシステム","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q036","chapter":"第1章","section":"AIの歴史","topic":"エキスパートシステム","format":"用語→定義","difficulty":"基礎","question":"「エキスパートシステム」の説明として最も適切なものを選んでください。","choices":["専門家の知識を規則として蓄積し推論する第二次AIブームを代表するシステム","行動に対する報酬を手掛かりに累積報酬を高める方策を学習する手法","人があらかじめ定めた条件と処理の規則に従って判断する方式","特定の限定された課題に特化して能力を発揮するAI"],"answer":1,"explanation":"エキスパートシステム：専門家の知識を規則として蓄積し推論する第二次AIブームを代表するシステム","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q037","chapter":"第1章","section":"シンギュラリティ","topic":"シンギュラリティ","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念」","choices":["教師なし学習","AI（人工知能）","シンギュラリティ","ニューラルネットワーク"],"answer":3,"explanation":"シンギュラリティ：AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q038","chapter":"第1章","section":"シンギュラリティ","topic":"シンギュラリティ","format":"用語→定義","difficulty":"基礎","question":"「シンギュラリティ」の説明として最も適切なものを選んでください。","choices":["人間の知的活動をコンピュータで再現・支援する技術や研究領域の総称","人工ニューロンを層状に接続し重みを調整して情報を処理するモデル","AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念","正解ラベルのないデータから構造やパターンを発見する手法"],"answer":3,"explanation":"シンギュラリティ：AIが人間の知能を大きく上回り社会が非連続に変化するという仮説的概念","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q039","chapter":"第2章","section":"生成AIの誕生","topic":"生成AI","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI」","choices":["ハルシネーション","VAE","BERT","生成AI"],"answer":4,"explanation":"生成AI：学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q040","chapter":"第2章","section":"生成AIの誕生","topic":"生成AI","format":"用語→定義","difficulty":"基礎","question":"「生成AI」の説明として最も適切なものを選んでください。","choices":["学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI","生成AIが事実に基づかない情報をもっともらしく出力する現象","前後両方向の文脈を利用して言語表現を学習するTransformer系モデル","入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル"],"answer":1,"explanation":"生成AI：学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q041","chapter":"第2章","section":"生成モデル","topic":"自己回帰モデル","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「過去の系列要素を基に次の要素を順次予測するモデル」","choices":["自己回帰モデル","LSTM","CNN","アライメント"],"answer":1,"explanation":"自己回帰モデル：過去の系列要素を基に次の要素を順次予測するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q042","chapter":"第2章","section":"生成モデル","topic":"自己回帰モデル","format":"用語→定義","difficulty":"標準","question":"「自己回帰モデル」の説明として最も適切なものを選んでください。","choices":["AIの振る舞いを人間の意図・価値観・安全上の要請に沿わせる考え方や調整","長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク","過去の系列要素を基に次の要素を順次予測するモデル"],"answer":4,"explanation":"自己回帰モデル：過去の系列要素を基に次の要素を順次予測するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q043","chapter":"第2章","section":"生成モデル","topic":"CNN","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク」","choices":["マルチモーダル","位置エンコーディング","CNN","RNN"],"answer":3,"explanation":"CNN：畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q044","chapter":"第2章","section":"生成モデル","topic":"CNN","format":"用語→定義","difficulty":"基礎","question":"「CNN」の説明として最も適切なものを選んでください。","choices":["過去の状態を次の処理へ受け渡し系列データを扱うニューラルネットワーク","Transformerにトークンの順序情報を与えるための表現","畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク","文章・画像・音声など複数種類のデータを統合して扱う性質"],"answer":3,"explanation":"CNN：畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q045","chapter":"第2章","section":"生成モデル","topic":"VAE","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル」","choices":["VAE","Self-Attention","CNN","RLHF"],"answer":1,"explanation":"VAE：入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q046","chapter":"第2章","section":"生成モデル","topic":"VAE","format":"用語→定義","difficulty":"基礎","question":"「VAE」の説明として最も適切なものを選んでください。","choices":["人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法","入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル","畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク","同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み"],"answer":2,"explanation":"VAE：入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q047","chapter":"第2章","section":"生成モデル","topic":"GAN","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「生成器と識別器を競わせ本物らしいデータの生成を学習するモデル」","choices":["LSTM","ハルシネーション","GPT","GAN"],"answer":4,"explanation":"GAN：生成器と識別器を競わせ本物らしいデータの生成を学習するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q048","chapter":"第2章","section":"生成モデル","topic":"GAN","format":"用語→定義","difficulty":"基礎","question":"「GAN」の説明として最も適切なものを選んでください。","choices":["生成器と識別器を競わせ本物らしいデータの生成を学習するモデル","長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列","生成AIが事実に基づかない情報をもっともらしく出力する現象"],"answer":1,"explanation":"GAN：生成器と識別器を競わせ本物らしいデータの生成を学習するモデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q049","chapter":"第2章","section":"生成モデル","topic":"RNN","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「過去の状態を次の処理へ受け渡し系列データを扱うニューラルネットワーク」","choices":["ファインチューニング","自己回帰モデル","RNN","位置エンコーディング"],"answer":3,"explanation":"RNN：過去の状態を次の処理へ受け渡し系列データを扱うニューラルネットワーク","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q050","chapter":"第2章","section":"生成モデル","topic":"RNN","format":"用語→定義","difficulty":"標準","question":"「RNN」の説明として最も適切なものを選んでください。","choices":["Transformerにトークンの順序情報を与えるための表現","学習済みモデルを特定用途の追加データで再学習して調整すること","過去の系列要素を基に次の要素を順次予測するモデル","過去の状態を次の処理へ受け渡し系列データを扱うニューラルネットワーク"],"answer":4,"explanation":"RNN：過去の状態を次の処理へ受け渡し系列データを扱うニューラルネットワーク","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q051","chapter":"第2章","section":"生成モデル","topic":"LSTM","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種」","choices":["GAN","LSTM","RLHF","生成AI"],"answer":2,"explanation":"LSTM：長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q052","chapter":"第2章","section":"生成モデル","topic":"LSTM","format":"用語→定義","difficulty":"基礎","question":"「LSTM」の説明として最も適切なものを選んでください。","choices":["長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI","生成器と識別器を競わせ本物らしいデータの生成を学習するモデル","人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法"],"answer":1,"explanation":"LSTM：長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q053","chapter":"第2章","section":"生成モデル","topic":"Transformer","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「Attentionを中心に系列データを並列処理できるニューラルネットワーク構造」","choices":["Transformer","ハルシネーション","VAE","Self-Attention"],"answer":1,"explanation":"Transformer：Attentionを中心に系列データを並列処理できるニューラルネットワーク構造","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q054","chapter":"第2章","section":"生成モデル","topic":"Transformer","format":"用語→定義","difficulty":"基礎","question":"「Transformer」の説明として最も適切なものを選んでください。","choices":["生成AIが事実に基づかない情報をもっともらしく出力する現象","Attentionを中心に系列データを並列処理できるニューラルネットワーク構造","同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み","入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル"],"answer":2,"explanation":"Transformer：Attentionを中心に系列データを並列処理できるニューラルネットワーク構造","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q055","chapter":"第2章","section":"Transformer","topic":"Self-Attention","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み」","choices":["自己回帰モデル","LSTM","GPT","Self-Attention"],"answer":4,"explanation":"Self-Attention：同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q056","chapter":"第2章","section":"Transformer","topic":"Self-Attention","format":"用語→定義","difficulty":"基礎","question":"「Self-Attention」の説明として最も適切なものを選んでください。","choices":["長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","過去の系列要素を基に次の要素を順次予測するモデル","同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み","与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列"],"answer":3,"explanation":"Self-Attention：同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q057","chapter":"第2章","section":"Transformer","topic":"位置エンコーディング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「Transformerにトークンの順序情報を与えるための表現」","choices":["位置エンコーディング","BERT","ファインチューニング","GAN"],"answer":1,"explanation":"位置エンコーディング：Transformerにトークンの順序情報を与えるための表現","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q058","chapter":"第2章","section":"Transformer","topic":"位置エンコーディング","format":"用語→定義","difficulty":"標準","question":"「位置エンコーディング」の説明として最も適切なものを選んでください。","choices":["前後両方向の文脈を利用して言語表現を学習するTransformer系モデル","学習済みモデルを特定用途の追加データで再学習して調整すること","生成器と識別器を競わせ本物らしいデータの生成を学習するモデル","Transformerにトークンの順序情報を与えるための表現"],"answer":4,"explanation":"位置エンコーディング：Transformerにトークンの順序情報を与えるための表現","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q059","chapter":"第2章","section":"派生モデル","topic":"BERT","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「前後両方向の文脈を利用して言語表現を学習するTransformer系モデル」","choices":["Transformer","BERT","生成AI","アライメント"],"answer":2,"explanation":"BERT：前後両方向の文脈を利用して言語表現を学習するTransformer系モデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q060","chapter":"第2章","section":"派生モデル","topic":"BERT","format":"用語→定義","difficulty":"基礎","question":"「BERT」の説明として最も適切なものを選んでください。","choices":["前後両方向の文脈を利用して言語表現を学習するTransformer系モデル","学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI","AIの振る舞いを人間の意図・価値観・安全上の要請に沿わせる考え方や調整","Attentionを中心に系列データを並列処理できるニューラルネットワーク構造"],"answer":1,"explanation":"BERT：前後両方向の文脈を利用して言語表現を学習するTransformer系モデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q061","chapter":"第2章","section":"ChatGPT","topic":"GPT","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列」","choices":["マルチモーダル","BERT","GPT","VAE"],"answer":3,"explanation":"GPT：与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q062","chapter":"第2章","section":"ChatGPT","topic":"GPT","format":"用語→定義","difficulty":"基礎","question":"「GPT」の説明として最も適切なものを選んでください。","choices":["前後両方向の文脈を利用して言語表現を学習するTransformer系モデル","入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル","与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列","文章・画像・音声など複数種類のデータを統合して扱う性質"],"answer":3,"explanation":"GPT：与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q063","chapter":"第2章","section":"ChatGPT","topic":"RLHF","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法」","choices":["CNN","LSTM","ファインチューニング","RLHF"],"answer":4,"explanation":"RLHF：人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q064","chapter":"第2章","section":"ChatGPT","topic":"RLHF","format":"用語→定義","difficulty":"基礎","question":"「RLHF」の説明として最も適切なものを選んでください。","choices":["人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法","畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク","学習済みモデルを特定用途の追加データで再学習して調整すること","長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種"],"answer":1,"explanation":"RLHF：人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q065","chapter":"第2章","section":"ChatGPT","topic":"アライメント","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIの振る舞いを人間の意図・価値観・安全上の要請に沿わせる考え方や調整」","choices":["アライメント","位置エンコーディング","RNN","生成AI"],"answer":1,"explanation":"アライメント：AIの振る舞いを人間の意図・価値観・安全上の要請に沿わせる考え方や調整","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q066","chapter":"第2章","section":"ChatGPT","topic":"アライメント","format":"用語→定義","difficulty":"標準","question":"「アライメント」の説明として最も適切なものを選んでください。","choices":["学習データの特徴を基に文章・画像・音声など新しいコンテンツを生成するAI","Transformerにトークンの順序情報を与えるための表現","過去の状態を次の処理へ受け渡し系列データを扱うニューラルネットワーク","AIの振る舞いを人間の意図・価値観・安全上の要請に沿わせる考え方や調整"],"answer":4,"explanation":"アライメント：AIの振る舞いを人間の意図・価値観・安全上の要請に沿わせる考え方や調整","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q067","chapter":"第2章","section":"ChatGPT","topic":"ファインチューニング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「学習済みモデルを特定用途の追加データで再学習して調整すること」","choices":["VAE","RLHF","ファインチューニング","Self-Attention"],"answer":3,"explanation":"ファインチューニング：学習済みモデルを特定用途の追加データで再学習して調整すること","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q068","chapter":"第2章","section":"ChatGPT","topic":"ファインチューニング","format":"用語→定義","difficulty":"基礎","question":"「ファインチューニング」の説明として最も適切なものを選んでください。","choices":["同じ系列内の各要素が他の要素との関連度を計算して情報を統合する仕組み","人間のフィードバックを報酬としてモデルの応答を望ましい方向へ調整する手法","学習済みモデルを特定用途の追加データで再学習して調整すること","入力を潜在空間の確率分布へ符号化しそこからデータを生成するモデル"],"answer":3,"explanation":"ファインチューニング：学習済みモデルを特定用途の追加データで再学習して調整すること","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q069","chapter":"第2章","section":"ChatGPT","topic":"ハルシネーション","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「生成AIが事実に基づかない情報をもっともらしく出力する現象」","choices":["ハルシネーション","GPT","LSTM","マルチモーダル"],"answer":1,"explanation":"ハルシネーション：生成AIが事実に基づかない情報をもっともらしく出力する現象","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q070","chapter":"第2章","section":"ChatGPT","topic":"ハルシネーション","format":"用語→定義","difficulty":"基礎","question":"「ハルシネーション」の説明として最も適切なものを選んでください。","choices":["文章・画像・音声など複数種類のデータを統合して扱う性質","生成AIが事実に基づかない情報をもっともらしく出力する現象","長期的な依存関係を扱いやすくするゲート機構を備えたRNNの一種","与えられた文脈に続くトークンを予測する自己回帰型の言語モデル系列"],"answer":2,"explanation":"ハルシネーション：生成AIが事実に基づかない情報をもっともらしく出力する現象","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q071","chapter":"第2章","section":"ChatGPT","topic":"マルチモーダル","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「文章・画像・音声など複数種類のデータを統合して扱う性質」","choices":["位置エンコーディング","CNN","ファインチューニング","マルチモーダル"],"answer":4,"explanation":"マルチモーダル：文章・画像・音声など複数種類のデータを統合して扱う性質","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q072","chapter":"第2章","section":"ChatGPT","topic":"マルチモーダル","format":"用語→定義","difficulty":"基礎","question":"「マルチモーダル」の説明として最も適切なものを選んでください。","choices":["文章・画像・音声など複数種類のデータを統合して扱う性質","Transformerにトークンの順序情報を与えるための表現","学習済みモデルを特定用途の追加データで再学習して調整すること","畳み込み処理により画像などの局所的特徴を抽出するニューラルネットワーク"],"answer":1,"explanation":"マルチモーダル：文章・画像・音声など複数種類のデータを統合して扱う性質","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q073","chapter":"第3章","section":"ディープフェイク","topic":"ディープフェイク","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIを用いて人物の映像や音声などを本物らしく合成・改変する技術」","choices":["MCP","ベクトルデータベース","ディープフェイク","ディスインフォメーション"],"answer":3,"explanation":"ディープフェイク：AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q074","chapter":"第3章","section":"ディープフェイク","topic":"ディープフェイク","format":"用語→定義","difficulty":"標準","question":"「ディープフェイク」の説明として最も適切なものを選んでください。","choices":["人を欺く目的で意図的に作成・拡散される虚偽または誤解を招く情報","AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル","文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース","AIを用いて人物の映像や音声などを本物らしく合成・改変する技術"],"answer":4,"explanation":"ディープフェイク：AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q075","chapter":"第3章","section":"ディープフェイク","topic":"ディスインフォメーション","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「人を欺く目的で意図的に作成・拡散される虚偽または誤解を招く情報」","choices":["ディープフェイク","ディスインフォメーション","ベクトルデータベース","チャンク"],"answer":2,"explanation":"ディスインフォメーション：人を欺く目的で意図的に作成・拡散される虚偽または誤解を招く情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q076","chapter":"第3章","section":"ディープフェイク","topic":"ディスインフォメーション","format":"用語→定義","difficulty":"基礎","question":"「ディスインフォメーション」の説明として最も適切なものを選んでください。","choices":["人を欺く目的で意図的に作成・拡散される虚偽または誤解を招く情報","検索や処理をしやすくするため文書を分割した小さな単位","AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース"],"answer":1,"explanation":"ディスインフォメーション：人を欺く目的で意図的に作成・拡散される虚偽または誤解を招く情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q077","chapter":"第3章","section":"RAG","topic":"RAG","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「外部情報を検索し結果を文脈として生成モデルに与える仕組み」","choices":["RAG","ディープフェイク","MCP","ベクトルデータベース"],"answer":1,"explanation":"RAG：外部情報を検索し結果を文脈として生成モデルに与える仕組み","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q078","chapter":"第3章","section":"RAG","topic":"RAG","format":"用語→定義","difficulty":"基礎","question":"「RAG」の説明として最も適切なものを選んでください。","choices":["AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","外部情報を検索し結果を文脈として生成モデルに与える仕組み","文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース","AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル"],"answer":2,"explanation":"RAG：外部情報を検索し結果を文脈として生成モデルに与える仕組み","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q079","chapter":"第3章","section":"RAG","topic":"チャンク","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「検索や処理をしやすくするため文書を分割した小さな単位」","choices":["ベクトルデータベース","RAG","ディープフェイク","チャンク"],"answer":4,"explanation":"チャンク：検索や処理をしやすくするため文書を分割した小さな単位","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q080","chapter":"第3章","section":"RAG","topic":"チャンク","format":"用語→定義","difficulty":"基礎","question":"「チャンク」の説明として最も適切なものを選んでください。","choices":["外部情報を検索し結果を文脈として生成モデルに与える仕組み","文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース","検索や処理をしやすくするため文書を分割した小さな単位","AIを用いて人物の映像や音声などを本物らしく合成・改変する技術"],"answer":3,"explanation":"チャンク：検索や処理をしやすくするため文書を分割した小さな単位","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q081","chapter":"第3章","section":"RAG","topic":"ベクトルデータベース","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース」","choices":["ベクトルデータベース","MCP","チャンク","ディープフェイク"],"answer":1,"explanation":"ベクトルデータベース：文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q082","chapter":"第3章","section":"RAG","topic":"ベクトルデータベース","format":"用語→定義","difficulty":"標準","question":"「ベクトルデータベース」の説明として最も適切なものを選んでください。","choices":["AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル","検索や処理をしやすくするため文書を分割した小さな単位","AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース"],"answer":4,"explanation":"ベクトルデータベース：文章などを数値ベクトルとして保存し意味的な近さで検索できるデータベース","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q083","chapter":"第3章","section":"AIエージェント","topic":"AIエージェント","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「目標に応じて状況を判断しツール利用など複数の行動を自律的に組み立てるシステム」","choices":["チャンク","AIエージェント","ディープフェイク","RAG"],"answer":2,"explanation":"AIエージェント：目標に応じて状況を判断しツール利用など複数の行動を自律的に組み立てるシステム","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q084","chapter":"第3章","section":"AIエージェント","topic":"AIエージェント","format":"用語→定義","difficulty":"基礎","question":"「AIエージェント」の説明として最も適切なものを選んでください。","choices":["目標に応じて状況を判断しツール利用など複数の行動を自律的に組み立てるシステム","AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","外部情報を検索し結果を文脈として生成モデルに与える仕組み","検索や処理をしやすくするため文書を分割した小さな単位"],"answer":1,"explanation":"AIエージェント：目標に応じて状況を判断しツール利用など複数の行動を自律的に組み立てるシステム","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q085","chapter":"第3章","section":"AIエージェント","topic":"MCP","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル」","choices":["AIエージェント","ディープフェイク","MCP","チャンク"],"answer":3,"explanation":"MCP：AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q086","chapter":"第3章","section":"AIエージェント","topic":"MCP","format":"用語→定義","difficulty":"基礎","question":"「MCP」の説明として最も適切なものを選んでください。","choices":["AIを用いて人物の映像や音声などを本物らしく合成・改変する技術","検索や処理をしやすくするため文書を分割した小さな単位","AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル","目標に応じて状況を判断しツール利用など複数の行動を自律的に組み立てるシステム"],"answer":3,"explanation":"MCP：AIアプリケーションと外部データやツールを共通方式で接続するためのプロトコル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q087","chapter":"第4章","section":"セキュリティ","topic":"フィッシング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「正規の組織などを装い認証情報や金銭情報をだまし取る攻撃」","choices":["営業秘密","AI提供者","著作権","フィッシング"],"answer":4,"explanation":"フィッシング：正規の組織などを装い認証情報や金銭情報をだまし取る攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q088","chapter":"第4章","section":"セキュリティ","topic":"フィッシング","format":"用語→定義","difficulty":"基礎","question":"「フィッシング」の説明として最も適切なものを選んでください。","choices":["正規の組織などを装い認証情報や金銭情報をだまし取る攻撃","秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報","著作物を創作した者に原則として発生し利用をコントロールする権利","AIシステムをサービス等として他者に提供する主体"],"answer":1,"explanation":"フィッシング：正規の組織などを装い認証情報や金銭情報をだまし取る攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q089","chapter":"第4章","section":"セキュリティ","topic":"スミッシング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「SMSを利用して偽サイトなどへ誘導するフィッシング攻撃」","choices":["スミッシング","ヴィッシング","AI開発者","肖像権"],"answer":1,"explanation":"スミッシング：SMSを利用して偽サイトなどへ誘導するフィッシング攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q090","chapter":"第4章","section":"セキュリティ","topic":"スミッシング","format":"用語→定義","difficulty":"標準","question":"「スミッシング」の説明として最も適切なものを選んでください。","choices":["自己の容貌や姿を無断で撮影・公表されないことに関わる人格的利益","電話や音声を利用して情報をだまし取るフィッシング攻撃","AIシステムやモデルを設計・開発する主体","SMSを利用して偽サイトなどへ誘導するフィッシング攻撃"],"answer":4,"explanation":"スミッシング：SMSを利用して偽サイトなどへ誘導するフィッシング攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q091","chapter":"第4章","section":"セキュリティ","topic":"ヴィッシング","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「電話や音声を利用して情報をだまし取るフィッシング攻撃」","choices":["透明性","スピアフィッシング","ヴィッシング","フィッシング"],"answer":3,"explanation":"ヴィッシング：電話や音声を利用して情報をだまし取るフィッシング攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q092","chapter":"第4章","section":"セキュリティ","topic":"ヴィッシング","format":"用語→定義","difficulty":"基礎","question":"「ヴィッシング」の説明として最も適切なものを選んでください。","choices":["正規の組織などを装い認証情報や金銭情報をだまし取る攻撃","特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃","電話や音声を利用して情報をだまし取るフィッシング攻撃","AIの利用や判断に関する情報を関係者が理解・検証できるよう適切に示す原則"],"answer":3,"explanation":"ヴィッシング：電話や音声を利用して情報をだまし取るフィッシング攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q093","chapter":"第4章","section":"セキュリティ","topic":"ランサムウェア","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「データを暗号化するなどして利用不能にし復旧と引き換えに金銭を要求するマルウェア」","choices":["ランサムウェア","ソーシャルエンジニアリング","AI提供者","匿名加工情報"],"answer":1,"explanation":"ランサムウェア：データを暗号化するなどして利用不能にし復旧と引き換えに金銭を要求するマルウェア","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q094","chapter":"第4章","section":"セキュリティ","topic":"ランサムウェア","format":"用語→定義","difficulty":"基礎","question":"「ランサムウェア」の説明として最も適切なものを選んでください。","choices":["特定個人を識別できず元の個人情報を復元できないよう加工した情報","データを暗号化するなどして利用不能にし復旧と引き換えに金銭を要求するマルウェア","AIシステムをサービス等として他者に提供する主体","人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法"],"answer":2,"explanation":"ランサムウェア：データを暗号化するなどして利用不能にし復旧と引き換えに金銭を要求するマルウェア","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q095","chapter":"第4章","section":"セキュリティ","topic":"ソーシャルエンジニアリング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法」","choices":["スミッシング","商標権","個人識別符号","ソーシャルエンジニアリング"],"answer":4,"explanation":"ソーシャルエンジニアリング：人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q096","chapter":"第4章","section":"セキュリティ","topic":"ソーシャルエンジニアリング","format":"用語→定義","difficulty":"基礎","question":"「ソーシャルエンジニアリング」の説明として最も適切なものを選んでください。","choices":["人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法","SMSを利用して偽サイトなどへ誘導するフィッシング攻撃","身体的特徴を変換した符号や公的番号など特定の個人を識別できる符号","商品やサービスを識別する標識を登録により保護する権利"],"answer":1,"explanation":"ソーシャルエンジニアリング：人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q097","chapter":"第4章","section":"セキュリティ","topic":"スピアフィッシング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃」","choices":["著作権","パブリシティ権","スピアフィッシング","ソーシャルエンジニアリング"],"answer":3,"explanation":"スピアフィッシング：特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q098","chapter":"第4章","section":"セキュリティ","topic":"スピアフィッシング","format":"用語→定義","difficulty":"標準","question":"「スピアフィッシング」の説明として最も適切なものを選んでください。","choices":["人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法","著作物を創作した者に原則として発生し利用をコントロールする権利","著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃"],"answer":4,"explanation":"スピアフィッシング：特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q099","chapter":"第4章","section":"個人情報保護","topic":"要配慮個人情報","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「差別や偏見などの不利益が生じないよう特に慎重な取扱いが求められる個人情報」","choices":["アカウンタビリティ","要配慮個人情報","匿名加工情報","肖像権"],"answer":2,"explanation":"要配慮個人情報：差別や偏見などの不利益が生じないよう特に慎重な取扱いが求められる個人情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q100","chapter":"第4章","section":"個人情報保護","topic":"要配慮個人情報","format":"用語→定義","difficulty":"基礎","question":"「要配慮個人情報」の説明として最も適切なものを選んでください。","choices":["差別や偏見などの不利益が生じないよう特に慎重な取扱いが求められる個人情報","自己の容貌や姿を無断で撮影・公表されないことに関わる人格的利益","AI利用による影響について説明し適切な責任を果たす原則","特定個人を識別できず元の個人情報を復元できないよう加工した情報"],"answer":1,"explanation":"要配慮個人情報：差別や偏見などの不利益が生じないよう特に慎重な取扱いが求められる個人情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q101","chapter":"第4章","section":"個人情報保護","topic":"個人識別符号","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「身体的特徴を変換した符号や公的番号など特定の個人を識別できる符号」","choices":["個人識別符号","商標権","透明性","AI利用者"],"answer":1,"explanation":"個人識別符号：身体的特徴を変換した符号や公的番号など特定の個人を識別できる符号","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q102","chapter":"第4章","section":"個人情報保護","topic":"個人識別符号","format":"用語→定義","difficulty":"基礎","question":"「個人識別符号」の説明として最も適切なものを選んでください。","choices":["商品やサービスを識別する標識を登録により保護する権利","身体的特徴を変換した符号や公的番号など特定の個人を識別できる符号","事業活動でAIシステムやサービスを利用する主体","AIの利用や判断に関する情報を関係者が理解・検証できるよう適切に示す原則"],"answer":2,"explanation":"個人識別符号：身体的特徴を変換した符号や公的番号など特定の個人を識別できる符号","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q103","chapter":"第4章","section":"個人情報保護","topic":"匿名加工情報","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「特定個人を識別できず元の個人情報を復元できないよう加工した情報」","choices":["パブリシティ権","AI提供者","ヴィッシング","匿名加工情報"],"answer":4,"explanation":"匿名加工情報：特定個人を識別できず元の個人情報を復元できないよう加工した情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q104","chapter":"第4章","section":"個人情報保護","topic":"匿名加工情報","format":"用語→定義","difficulty":"基礎","question":"「匿名加工情報」の説明として最も適切なものを選んでください。","choices":["AIシステムをサービス等として他者に提供する主体","著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","特定個人を識別できず元の個人情報を復元できないよう加工した情報","電話や音声を利用して情報をだまし取るフィッシング攻撃"],"answer":3,"explanation":"匿名加工情報：特定個人を識別できず元の個人情報を復元できないよう加工した情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q105","chapter":"第4章","section":"個人情報保護","topic":"マスキング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「情報の一部を隠したり置換したりして機密情報や個人情報の露出を抑える処理」","choices":["マスキング","スミッシング","スピアフィッシング","アカウンタビリティ"],"answer":1,"explanation":"マスキング：情報の一部を隠したり置換したりして機密情報や個人情報の露出を抑える処理","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q106","chapter":"第4章","section":"個人情報保護","topic":"マスキング","format":"用語→定義","difficulty":"標準","question":"「マスキング」の説明として最も適切なものを選んでください。","choices":["SMSを利用して偽サイトなどへ誘導するフィッシング攻撃","特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃","AI利用による影響について説明し適切な責任を果たす原則","情報の一部を隠したり置換したりして機密情報や個人情報の露出を抑える処理"],"answer":4,"explanation":"マスキング：情報の一部を隠したり置換したりして機密情報や個人情報の露出を抑える処理","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q107","chapter":"第4章","section":"知的財産権","topic":"著作権","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「著作物を創作した者に原則として発生し利用をコントロールする権利」","choices":["AI利用者","著作権","匿名加工情報","ソーシャルエンジニアリング"],"answer":2,"explanation":"著作権：著作物を創作した者に原則として発生し利用をコントロールする権利","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q108","chapter":"第4章","section":"知的財産権","topic":"著作権","format":"用語→定義","difficulty":"基礎","question":"「著作権」の説明として最も適切なものを選んでください。","choices":["著作物を創作した者に原則として発生し利用をコントロールする権利","特定個人を識別できず元の個人情報を復元できないよう加工した情報","人の心理や行動上の隙を利用して秘密情報などを取得する攻撃手法","事業活動でAIシステムやサービスを利用する主体"],"answer":1,"explanation":"著作権：著作物を創作した者に原則として発生し利用をコントロールする権利","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q109","chapter":"第4章","section":"知的財産権","topic":"商標権","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「商品やサービスを識別する標識を登録により保護する権利」","choices":["個人識別符号","ヴィッシング","商標権","意匠権"],"answer":3,"explanation":"商標権：商品やサービスを識別する標識を登録により保護する権利","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q110","chapter":"第4章","section":"知的財産権","topic":"商標権","format":"用語→定義","difficulty":"基礎","question":"「商標権」の説明として最も適切なものを選んでください。","choices":["電話や音声を利用して情報をだまし取るフィッシング攻撃","物品等のデザインを登録により保護する権利","商品やサービスを識別する標識を登録により保護する権利","身体的特徴を変換した符号や公的番号など特定の個人を識別できる符号"],"answer":3,"explanation":"商標権：商品やサービスを識別する標識を登録により保護する権利","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q111","chapter":"第4章","section":"知的財産権","topic":"意匠権","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「物品等のデザインを登録により保護する権利」","choices":["著作権","営業秘密","スピアフィッシング","意匠権"],"answer":4,"explanation":"意匠権：物品等のデザインを登録により保護する権利","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q112","chapter":"第4章","section":"知的財産権","topic":"意匠権","format":"用語→定義","difficulty":"基礎","question":"「意匠権」の説明として最も適切なものを選んでください。","choices":["物品等のデザインを登録により保護する権利","著作物を創作した者に原則として発生し利用をコントロールする権利","特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃","秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報"],"answer":1,"explanation":"意匠権：物品等のデザインを登録により保護する権利","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q113","chapter":"第4章","section":"権利","topic":"肖像権","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「自己の容貌や姿を無断で撮影・公表されないことに関わる人格的利益」","choices":["肖像権","AI開発者","パブリシティ権","匿名加工情報"],"answer":1,"explanation":"肖像権：自己の容貌や姿を無断で撮影・公表されないことに関わる人格的利益","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q114","chapter":"第4章","section":"権利","topic":"肖像権","format":"用語→定義","difficulty":"標準","question":"「肖像権」の説明として最も適切なものを選んでください。","choices":["特定個人を識別できず元の個人情報を復元できないよう加工した情報","AIシステムやモデルを設計・開発する主体","著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","自己の容貌や姿を無断で撮影・公表されないことに関わる人格的利益"],"answer":4,"explanation":"肖像権：自己の容貌や姿を無断で撮影・公表されないことに関わる人格的利益","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q115","chapter":"第4章","section":"権利","topic":"パブリシティ権","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益」","choices":["商標権","フィッシング","パブリシティ権","アカウンタビリティ"],"answer":3,"explanation":"パブリシティ権：著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q116","chapter":"第4章","section":"権利","topic":"パブリシティ権","format":"用語→定義","difficulty":"基礎","question":"「パブリシティ権」の説明として最も適切なものを選んでください。","choices":["AI利用による影響について説明し適切な責任を果たす原則","正規の組織などを装い認証情報や金銭情報をだまし取る攻撃","著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","商品やサービスを識別する標識を登録により保護する権利"],"answer":3,"explanation":"パブリシティ権：著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q117","chapter":"第4章","section":"不正競争防止法","topic":"営業秘密","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報」","choices":["営業秘密","AI利用者","パブリシティ権","ランサムウェア"],"answer":1,"explanation":"営業秘密：秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q118","chapter":"第4章","section":"不正競争防止法","topic":"営業秘密","format":"用語→定義","difficulty":"基礎","question":"「営業秘密」の説明として最も適切なものを選んでください。","choices":["データを暗号化するなどして利用不能にし復旧と引き換えに金銭を要求するマルウェア","秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報","著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","事業活動でAIシステムやサービスを利用する主体"],"answer":2,"explanation":"営業秘密：秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q119","chapter":"第4章","section":"AI社会原則","topic":"透明性","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIの利用や判断に関する情報を関係者が理解・検証できるよう適切に示す原則」","choices":["AI開発者","要配慮個人情報","ヴィッシング","透明性"],"answer":4,"explanation":"透明性：AIの利用や判断に関する情報を関係者が理解・検証できるよう適切に示す原則","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q120","chapter":"第4章","section":"AI社会原則","topic":"透明性","format":"用語→定義","difficulty":"基礎","question":"「透明性」の説明として最も適切なものを選んでください。","choices":["AIの利用や判断に関する情報を関係者が理解・検証できるよう適切に示す原則","AIシステムやモデルを設計・開発する主体","電話や音声を利用して情報をだまし取るフィッシング攻撃","差別や偏見などの不利益が生じないよう特に慎重な取扱いが求められる個人情報"],"answer":1,"explanation":"透明性：AIの利用や判断に関する情報を関係者が理解・検証できるよう適切に示す原則","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q121","chapter":"第4章","section":"AI社会原則","topic":"アカウンタビリティ","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「AI利用による影響について説明し適切な責任を果たす原則」","choices":["スピアフィッシング","マスキング","アカウンタビリティ","フィッシング"],"answer":3,"explanation":"アカウンタビリティ：AI利用による影響について説明し適切な責任を果たす原則","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q122","chapter":"第4章","section":"AI社会原則","topic":"アカウンタビリティ","format":"用語→定義","difficulty":"標準","question":"「アカウンタビリティ」の説明として最も適切なものを選んでください。","choices":["正規の組織などを装い認証情報や金銭情報をだまし取る攻撃","特定の個人や組織を狙い相手に合わせて巧妙に作られたフィッシング攻撃","情報の一部を隠したり置換したりして機密情報や個人情報の露出を抑える処理","AI利用による影響について説明し適切な責任を果たす原則"],"answer":4,"explanation":"アカウンタビリティ：AI利用による影響について説明し適切な責任を果たす原則","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q123","chapter":"第4章","section":"AI事業者ガイドライン","topic":"AI開発者","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIシステムやモデルを設計・開発する主体」","choices":["意匠権","AI開発者","ランサムウェア","匿名加工情報"],"answer":2,"explanation":"AI開発者：AIシステムやモデルを設計・開発する主体","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q124","chapter":"第4章","section":"AI事業者ガイドライン","topic":"AI開発者","format":"用語→定義","difficulty":"基礎","question":"「AI開発者」の説明として最も適切なものを選んでください。","choices":["AIシステムやモデルを設計・開発する主体","特定個人を識別できず元の個人情報を復元できないよう加工した情報","物品等のデザインを登録により保護する権利","データを暗号化するなどして利用不能にし復旧と引き換えに金銭を要求するマルウェア"],"answer":1,"explanation":"AI開発者：AIシステムやモデルを設計・開発する主体","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q125","chapter":"第4章","section":"AI事業者ガイドライン","topic":"AI提供者","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「AIシステムをサービス等として他者に提供する主体」","choices":["AI提供者","要配慮個人情報","商標権","営業秘密"],"answer":1,"explanation":"AI提供者：AIシステムをサービス等として他者に提供する主体","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q126","chapter":"第4章","section":"AI事業者ガイドライン","topic":"AI提供者","format":"用語→定義","difficulty":"基礎","question":"「AI提供者」の説明として最も適切なものを選んでください。","choices":["差別や偏見などの不利益が生じないよう特に慎重な取扱いが求められる個人情報","AIシステムをサービス等として他者に提供する主体","秘密管理性・有用性・非公知性を満たし不正競争防止法で保護される事業上の情報","商品やサービスを識別する標識を登録により保護する権利"],"answer":2,"explanation":"AI提供者：AIシステムをサービス等として他者に提供する主体","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q127","chapter":"第4章","section":"AI事業者ガイドライン","topic":"AI利用者","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「事業活動でAIシステムやサービスを利用する主体」","choices":["マスキング","パブリシティ権","AI開発者","AI利用者"],"answer":4,"explanation":"AI利用者：事業活動でAIシステムやサービスを利用する主体","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q128","chapter":"第4章","section":"AI事業者ガイドライン","topic":"AI利用者","format":"用語→定義","difficulty":"基礎","question":"「AI利用者」の説明として最も適切なものを選んでください。","choices":["著名人の氏名や肖像が持つ顧客吸引力を排他的に利用できる権利・利益","情報の一部を隠したり置換したりして機密情報や個人情報の露出を抑える処理","事業活動でAIシステムやサービスを利用する主体","AIシステムやモデルを設計・開発する主体"],"answer":3,"explanation":"AI利用者：事業活動でAIシステムやサービスを利用する主体","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q129","chapter":"第5章","section":"LMとLLM","topic":"LM","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「単語やトークンの並びに確率を与え次の要素などを予測する言語モデル」","choices":["LM","Few-Shotプロンプティング","Top-p","LLM"],"answer":1,"explanation":"LM：単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q130","chapter":"第5章","section":"LMとLLM","topic":"LM","format":"用語→定義","difficulty":"標準","question":"「LM」の説明として最も適切なものを選んでください。","choices":["少数の入出力例をプロンプト内に示してタスクを実行させる方法","累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御","大量のデータと多数のパラメータで学習した大規模な言語モデル","単語やトークンの並びに確率を与え次の要素などを予測する言語モデル"],"answer":4,"explanation":"LM：単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q131","chapter":"第5章","section":"LMとLLM","topic":"LLM","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「大量のデータと多数のパラメータで学習した大規模な言語モデル」","choices":["Top-p","LLM","LM","Temperature"],"answer":2,"explanation":"LLM：大量のデータと多数のパラメータで学習した大規模な言語モデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q132","chapter":"第5章","section":"LMとLLM","topic":"LLM","format":"用語→定義","difficulty":"基礎","question":"「LLM」の説明として最も適切なものを選んでください。","choices":["大量のデータと多数のパラメータで学習した大規模な言語モデル","単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値","累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御"],"answer":1,"explanation":"LLM：大量のデータと多数のパラメータで学習した大規模な言語モデル","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q133","chapter":"第5章","section":"LMとLLM","topic":"プレトレーニング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「大規模データを使いモデルに一般的パターンや知識を事前学習させる工程」","choices":["Few-Shotプロンプティング","LM","プレトレーニング","Top-p"],"answer":3,"explanation":"プレトレーニング：大規模データを使いモデルに一般的パターンや知識を事前学習させる工程","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q134","chapter":"第5章","section":"LMとLLM","topic":"プレトレーニング","format":"用語→定義","difficulty":"基礎","question":"「プレトレーニング」の説明として最も適切なものを選んでください。","choices":["単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御","大規模データを使いモデルに一般的パターンや知識を事前学習させる工程","少数の入出力例をプロンプト内に示してタスクを実行させる方法"],"answer":3,"explanation":"プレトレーニング：大規模データを使いモデルに一般的パターンや知識を事前学習させる工程","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q135","chapter":"第5章","section":"ハイパーパラメータ","topic":"Temperature","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値」","choices":["プレトレーニング","LM","Top-p","Temperature"],"answer":4,"explanation":"Temperature：生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q136","chapter":"第5章","section":"ハイパーパラメータ","topic":"Temperature","format":"用語→定義","difficulty":"基礎","question":"「Temperature」の説明として最も適切なものを選んでください。","choices":["生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値","大規模データを使いモデルに一般的パターンや知識を事前学習させる工程","累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御","単語やトークンの並びに確率を与え次の要素などを予測する言語モデル"],"answer":1,"explanation":"Temperature：生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q137","chapter":"第5章","section":"ハイパーパラメータ","topic":"Top-p","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御」","choices":["Top-p","Temperature","Few-Shotプロンプティング","LM"],"answer":1,"explanation":"Top-p：累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q138","chapter":"第5章","section":"ハイパーパラメータ","topic":"Top-p","format":"用語→定義","difficulty":"標準","question":"「Top-p」の説明として最も適切なものを選んでください。","choices":["単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値","少数の入出力例をプロンプト内に示してタスクを実行させる方法","累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御"],"answer":4,"explanation":"Top-p：累積確率が指定値に達する候補集合から次のトークンを選ぶ生成制御","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q139","chapter":"第5章","section":"プロンプティング","topic":"Zero-Shotプロンプティング","format":"定義→用語","difficulty":"基礎","question":"次の説明に最も当てはまる用語を選んでください。\n「例示を与えず指示だけでタスクを実行させる方法」","choices":["Temperature","LM","Zero-Shotプロンプティング","プレトレーニング"],"answer":3,"explanation":"Zero-Shotプロンプティング：例示を与えず指示だけでタスクを実行させる方法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q140","chapter":"第5章","section":"プロンプティング","topic":"Zero-Shotプロンプティング","format":"用語→定義","difficulty":"基礎","question":"「Zero-Shotプロンプティング」の説明として最も適切なものを選んでください。","choices":["大規模データを使いモデルに一般的パターンや知識を事前学習させる工程","単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","例示を与えず指示だけでタスクを実行させる方法","生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値"],"answer":3,"explanation":"Zero-Shotプロンプティング：例示を与えず指示だけでタスクを実行させる方法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q141","chapter":"第5章","section":"プロンプティング","topic":"Few-Shotプロンプティング","format":"定義→用語","difficulty":"標準","question":"次の説明に最も当てはまる用語を選んでください。\n「少数の入出力例をプロンプト内に示してタスクを実行させる方法」","choices":["Few-Shotプロンプティング","Zero-Shotプロンプティング","LM","Temperature"],"answer":1,"explanation":"Few-Shotプロンプティング：少数の入出力例をプロンプト内に示してタスクを実行させる方法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q142","chapter":"第5章","section":"プロンプティング","topic":"Few-Shotプロンプティング","format":"用語→定義","difficulty":"基礎","question":"「Few-Shotプロンプティング」の説明として最も適切なものを選んでください。","choices":["生成時の確率分布を調整し一般に高くすると出力の多様性が増す設定値","少数の入出力例をプロンプト内に示してタスクを実行させる方法","単語やトークンの並びに確率を与え次の要素などを予測する言語モデル","例示を与えず指示だけでタスクを実行させる方法"],"answer":2,"explanation":"Few-Shotプロンプティング：少数の入出力例をプロンプト内に示してタスクを実行させる方法","evidenceType":"シラバス準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q143","chapter":"第4章","section":"個人情報保護","topic":"生成AIへの入力","format":"事例判断","difficulty":"標準","question":"顧客名・住所・相談内容を一般向け生成AIへ入力してメールを作ろうとしている。最も適切な対応はどれですか。","choices":["業務目的ならそのまま入力する","氏名だけ消せば必ず安全である","規約・社内ルール・データ取扱いを確認し、必要最小化や匿名化を行い承認環境を使う","生成後に履歴を消せば問題ない"],"answer":3,"explanation":"個人情報の入力では利用目的だけでなく、サービスのデータ取扱い、社内規程、必要最小化等を確認します。","evidenceType":"公式資料準拠・独自作成","sourceName":"個人情報保護委員会","sourceUrl":"https://www.ppc.go.jp/personalinfo/","reviewedAt":"2026-09-14"},{"id":"Q144","chapter":"第4章","section":"個人情報保護","topic":"要配慮個人情報","format":"事例判断","difficulty":"標準","question":"次のうち要配慮個人情報に該当する可能性が最も高いものはどれですか。","choices":["取引先の会社名","本人の病歴","商品の型番","公開済みの天気情報"],"answer":2,"explanation":"病歴は要配慮個人情報に該当します。","evidenceType":"公式資料準拠・独自作成","sourceName":"個人情報保護委員会","sourceUrl":"https://www.ppc.go.jp/personalinfo/","reviewedAt":"2026-09-14"},{"id":"Q145","chapter":"第4章","section":"個人情報保護","topic":"匿名加工情報","format":"事例判断","difficulty":"標準","question":"氏名を削除した顧客データを『匿名加工情報だから自由に使える』と判断した。適切な説明はどれですか。","choices":["氏名を消せば必ず匿名加工情報になる","復元できないよう必要な加工等を行う必要があり、単なる氏名削除だけでは足りない","社内利用なら加工不要","AIへの入力で自動的に匿名化される"],"answer":2,"explanation":"匿名加工情報には、特定個人を識別できず元の個人情報を復元できないための加工が必要です。","evidenceType":"公式資料準拠・独自作成","sourceName":"個人情報保護委員会","sourceUrl":"https://www.ppc.go.jp/personalinfo/","reviewedAt":"2026-09-14"},{"id":"Q146","chapter":"第2章","section":"ChatGPT","topic":"ハルシネーション","format":"事例判断","difficulty":"標準","question":"生成AIが提示した判例名と条文番号を報告書へ使用する場合、最も適切な行動はどれですか。","choices":["文章が自然なら使用する","同じAIに再質問して一致すれば使用する","一次資料や信頼できる情報源で事実確認する","長い回答なら使用する"],"answer":3,"explanation":"生成AIはもっともらしい誤情報を出すことがあるため、重要情報は一次資料等で検証します。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q147","chapter":"第3章","section":"RAG","topic":"検索結果の品質","format":"事例判断","difficulty":"標準","question":"社内規程をRAGで回答させたところ、廃止済み規程を根拠に回答した。最も直接的に見直すべき点はどれですか。","choices":["Temperatureだけを上げる","検索文書の更新管理とメタデータ・検索条件","回答文を長くする","質問者の入力速度"],"answer":2,"explanation":"RAGでも検索元が古ければ回答根拠も古くなります。文書の版管理と検索条件が重要です。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q148","chapter":"第3章","section":"RAG","topic":"RAGとファインチューニング","format":"事例判断","difficulty":"標準","question":"頻繁に更新される社内マニュアルを根拠付きで回答させたい。第一候補はどれですか。","choices":["毎回モデルを最初から学習する","RAGで最新文書を検索し回答へ利用する","Temperatureを最大にする","Few-Shotだけを増やす"],"answer":2,"explanation":"更新される外部知識を参照して回答する用途にはRAGが適しています。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q149","chapter":"第3章","section":"AIエージェント","topic":"自律的実行","format":"事例判断","difficulty":"標準","question":"AIエージェントに経費精算を任せる際、最も適切な設計はどれですか。","choices":["全金額を無条件で自動承認","重要操作に権限分離・上限・確認・ログを設ける","実行ログを残さない","外部ツール権限を最大化"],"answer":2,"explanation":"自律実行には権限の最小化、人の確認、上限、監査ログ等の統制が必要です。","evidenceType":"公式資料準拠・独自作成","sourceName":"経済産業省 AI事業者ガイドライン","sourceUrl":"https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/20240419_report.html","reviewedAt":"2026-09-14"},{"id":"Q150","chapter":"第5章","section":"プロンプティング","topic":"プロンプト構造","format":"事例判断","difficulty":"標準","question":"要約結果を安定させる指示として最も適切なものはどれですか。","choices":["短くして","あなたは編集者です。以下を対象読者・文字数・出力形式を守って要約してください","いい感じにして","とにかく正確に"],"answer":2,"explanation":"役割、指示、対象、制約、出力形式を具体化すると意図が伝わりやすくなります。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q151","chapter":"第5章","section":"ハイパーパラメータ","topic":"Temperature","format":"事例判断","difficulty":"標準","question":"多様なキャッチコピー案を得たい。一般的なTemperature調整として適切なのはどれですか。","choices":["低くして固定化する","適度に高くして多様性を増やす","0未満にする","文字数と同じ値にする"],"answer":2,"explanation":"一般にTemperatureを高めると出力の多様性が増します。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q152","chapter":"第4章","section":"知的財産権","topic":"著作権確認","format":"事例判断","difficulty":"標準","question":"生成AI画像を広告に使う際、最も適切な対応はどれですか。","choices":["AI生成なので権利確認不要","既存著作物との類似、利用規約、入力素材の権利を確認する","無料サービスなら必ず商用利用可能","少し加工すれば必ず侵害しない"],"answer":2,"explanation":"生成物でも既存著作物との類似や利用規約、入力素材の権利等を確認します。","evidenceType":"公式資料準拠・独自作成","sourceName":"文化庁 著作権","sourceUrl":"https://www.bunka.go.jp/seisaku/chosakuken/","reviewedAt":"2026-09-14"},{"id":"Q153","chapter":"第4章","section":"セキュリティ","topic":"フィッシング","format":"事例判断","difficulty":"標準","question":"取引先を名乗るメールから『緊急でパスワード確認』というリンクが届いた。適切な初動はどれですか。","choices":["リンクを開く","返信して聞く","リンクを開かず既知の連絡先や公式サイトから確認する","同僚へ転送して開いてもらう"],"answer":3,"explanation":"不審なリンクを開かず、別の信頼できる経路で確認します。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q154","chapter":"第4章","section":"セキュリティ","topic":"スミッシング","format":"事例判断","difficulty":"標準","question":"宅配業者を名乗るSMSの偽リンクで認証情報を盗む攻撃は何ですか。","choices":["ヴィッシング","スミッシング","ドロップアウト","クラスタリング"],"answer":2,"explanation":"SMSを使うフィッシングはスミッシングです。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q155","chapter":"第4章","section":"セキュリティ","topic":"ランサムウェア","format":"事例判断","difficulty":"標準","question":"社内ファイルが暗号化され身代金を要求された。適切な対応はどれですか。","choices":["独断ですぐ支払う","端末を隔離し組織の手順に従って報告・対応する","SNSへ投稿する","同じパスワードで再ログインする"],"answer":2,"explanation":"被害拡大を防ぐ隔離と組織のインシデント対応が重要です。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q156","chapter":"第4章","section":"権利","topic":"肖像・パブリシティ","format":"事例判断","difficulty":"標準","question":"著名人に似せたAI画像を商品の宣伝に使う場合、特に確認すべき権利はどれですか。","choices":["肖像権やパブリシティ権","所有権だけ","特許権だけ","確認不要"],"answer":1,"explanation":"容貌や顧客吸引力の商業利用では肖像権・パブリシティ権等が問題になります。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q157","chapter":"第4章","section":"AI社会原則","topic":"アカウンタビリティ","format":"事例判断","difficulty":"標準","question":"AIの推薦で顧客に不利益が生じた。適切な姿勢はどれですか。","choices":["AIが決めたので責任はない","影響を検証し説明・是正・再発防止を行う","モデル名だけ公表する","記録を削除する"],"answer":2,"explanation":"役割に応じて影響を説明し、適切に対応する必要があります。","evidenceType":"公式資料準拠・独自作成","sourceName":"経済産業省 AI事業者ガイドライン","sourceUrl":"https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/20240419_report.html","reviewedAt":"2026-09-14"},{"id":"Q158","chapter":"第4章","section":"AI事業者ガイドライン","topic":"主体区分","format":"事例判断","difficulty":"標準","question":"他社の生成AIサービスを自社業務で使う会社は主としてどの主体ですか。","choices":["AI開発者","AI提供者","AI利用者","いずれでもない"],"answer":3,"explanation":"事業活動でAIサービスを利用する主体はAI利用者です。","evidenceType":"公式資料準拠・独自作成","sourceName":"経済産業省 AI事業者ガイドライン","sourceUrl":"https://www.meti.go.jp/shingikai/mono_info_service/ai_shakai_jisso/20240419_report.html","reviewedAt":"2026-09-14"},{"id":"Q159","chapter":"第1章","section":"過学習","topic":"性能評価","format":"事例判断","difficulty":"標準","question":"訓練データでは高精度だが初見データでは精度が大幅に落ちた。考えられる状態はどれですか。","choices":["転移学習","過学習","次元削減","強化学習"],"answer":2,"explanation":"訓練データへ適合しすぎ未知データへの性能が低下する状態が過学習です。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q160","chapter":"第1章","section":"機械学習","topic":"教師あり学習","format":"事例判断","difficulty":"標準","question":"メールに『迷惑／通常』の正解ラベルを付けて分類器を学習させる手法はどれですか。","choices":["教師あり学習","教師なし学習","強化学習","次元削減"],"answer":1,"explanation":"入力と正解ラベルの組を利用するため教師あり学習です。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q161","chapter":"第2章","section":"生成モデル","topic":"GAN","format":"事例判断","difficulty":"標準","question":"生成器と識別器を競わせ本物らしいデータを生成する方式はどれですか。","choices":["VAE","GAN","RNN","BERT"],"answer":2,"explanation":"GANは生成器と識別器を競わせて学習します。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"},{"id":"Q162","chapter":"第5章","section":"生成AIの不得意","topic":"最新情報","format":"事例判断","difficulty":"標準","question":"『今日施行された制度』を質問する際の対応として適切なのはどれですか。","choices":["回答を無条件で信頼","知識時点を確認し最新の一次情報で検証","長文なら最新と判断","固有名詞があれば正しい"],"answer":2,"explanation":"最新情報はモデルの参照可能時点を確認し、公式な一次情報で検証します。","evidenceType":"公式資料準拠・独自作成","sourceName":"GUGA公式シラバス","sourceUrl":"https://guga.or.jp/assets/syllabus.pdf","reviewedAt":"2026-09-14"}];
+
+</script>
+    <script>
+(() => {
+  "use strict";
+
+  const bank = Array.isArray(window.QUESTION_BANK) ? window.QUESTION_BANK : [];
+  const storageKey = "genai-passport-study-2026-v1";
+  const app = document.getElementById("app");
+  const homeButton = document.getElementById("homeButton");
+  const settingsButton = document.getElementById("settingsButton");
+  const settingsDialog = document.getElementById("settingsDialog");
+  const resetButton = document.getElementById("resetButton");
+
+  const defaultState = () => ({ stats: {}, mockHistory: [] });
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey));
+      return saved && saved.stats ? saved : defaultState();
+    } catch (_) {
+      return defaultState();
+    }
+  }
+
+  let state = loadState();
+  let session = null;
+
+  const escapeHtml = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+  function safeUrl(value) {
+    try {
+      const url = new URL(value);
+      return ["https:", "http:"].includes(url.protocol) ? url.href : "#";
+    } catch (_) {
+      return "#";
+    }
+  }
+
+  function saveState() {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+    const note = document.getElementById("savedNote");
+    if (note) {
+      note.textContent = "保存しました";
+      window.setTimeout(() => { note.textContent = "この端末に自動保存"; }, 900);
+    }
+  }
+
+  function shuffle(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  const questionStat = (id) => state.stats[id] || { attempts: 0, correct: 0, needsReview: false, manualReview: false };
+  const chapters = [...new Set(bank.map((q) => q.chapter))].sort((a, b) => a.localeCompare(b, "ja", { numeric: true }));
+
+  function totals() {
+    const values = Object.values(state.stats);
+    const attempts = values.reduce((sum, item) => sum + (item.attempts || 0), 0);
+    const correct = values.reduce((sum, item) => sum + (item.correct || 0), 0);
+    const answered = values.filter((item) => (item.attempts || 0) > 0).length;
+    const review = bank.filter((q) => questionStat(q.id).needsReview).length;
+    return { attempts, correct, answered, review, rate: attempts ? Math.round((correct / attempts) * 100) : 0 };
+  }
+
+  function chapterProgress(chapter) {
+    const questions = bank.filter((q) => q.chapter === chapter);
+    const mastered = questions.filter((q) => {
+      const stat = questionStat(q.id);
+      return stat.correct > 0 && !stat.needsReview;
+    }).length;
+    return { count: questions.length, mastered, rate: questions.length ? Math.round((mastered / questions.length) * 100) : 0 };
+  }
+
+  function stopTimer() {
+    if (session?.timerId) window.clearInterval(session.timerId);
+    if (session) session.timerId = null;
+  }
+
+  function goHome() {
+    stopTimer();
+    session = null;
+    renderHome();
+  }
+
+  function renderHome() {
+    const t = totals();
+    app.innerHTML = `
+      <section class="home-intro">
+        <div>
+          <span class="eyebrow">YOUR STUDY DESK</span>
+          <h1>一発合格まで、<br>迷わず解く。</h1>
+          <p class="lead">全${bank.length}問から、章別・ランダム・本番形式で繰り返せます。間違えた問題は自動で「要復習」に集まります。</p>
+        </div>
+        <div class="goal-chip">目標：10月試験・一発合格</div>
+      </section>
+
+      <section class="stats-grid" aria-label="学習状況">
+        <div class="stat-card"><span>学習済み</span><strong>${t.answered}<small> / ${bank.length}問</small></strong></div>
+        <div class="stat-card"><span>総回答数</span><strong>${t.attempts}<small> 回</small></strong></div>
+        <div class="stat-card"><span>正答率</span><strong>${t.rate}<small> %</small></strong></div>
+        <div class="stat-card"><span>要復習</span><strong>${t.review}<small> 問</small></strong></div>
+      </section>
+
+      <div class="section-title"><h2>今日のトレーニング</h2><span>解いた分だけ自動保存</span></div>
+      <section class="mode-grid">
+        <button class="mode-card primary" type="button" data-start="quick">
+          <span class="mode-icon">10</span><h3>ランダム10問</h3>
+          <p>全範囲から10問。すきま時間の確認に。</p><span class="card-link">すぐ始める →</span>
+        </button>
+        <button class="mode-card" type="button" data-start="review">
+          <span class="mode-icon">↺</span><h3>要復習だけ</h3>
+          <p>${t.review ? `${t.review}問の弱点を集中して解き直します。` : "間違えた問題や、印を付けた問題がここに集まります。"}</p><span class="card-link">復習を始める →</span>
+        </button>
+        <button class="mode-card" type="button" data-start="mock">
+          <span class="mode-icon">60</span><h3>模擬試験</h3>
+          <p>本番と同じ60問・60分。解説は採点後に確認できます。</p><span class="card-link">試験を始める →</span>
+        </button>
+      </section>
+
+      <div class="section-title"><h2>章ごとに学ぶ</h2><span>各回ランダム10問</span></div>
+      <section class="chapter-grid">
+        ${chapters.map((chapter) => {
+          const progress = chapterProgress(chapter);
+          return `<button class="chapter-button" type="button" data-chapter="${escapeHtml(chapter)}">
+            <b>${escapeHtml(chapter)}</b><span>${progress.count}問中 ${progress.mastered}問を習得</span>
+            <div class="chapter-meter" aria-label="習得率${progress.rate}%"><i style="width:${progress.rate}%"></i></div>
+          </button>`;
+        }).join("")}
+      </section>
+    `;
+
+    app.querySelectorAll("[data-start]").forEach((button) => {
+      button.addEventListener("click", () => startSession(button.dataset.start));
+    });
+    app.querySelectorAll("[data-chapter]").forEach((button) => {
+      button.addEventListener("click", () => startSession("chapter", button.dataset.chapter));
+    });
+    app.focus({ preventScroll: true });
+  }
+
+  function startSession(mode, chapter = null, customQuestions = null) {
+    let questions;
+    let label;
+    if (customQuestions) {
+      questions = customQuestions;
+      label = "解き直し";
+      mode = "review";
+    } else if (mode === "quick") {
+      questions = shuffle(bank).slice(0, 10);
+      label = "ランダム10問";
+    } else if (mode === "chapter") {
+      questions = shuffle(bank.filter((q) => q.chapter === chapter)).slice(0, 10);
+      label = `${chapter}｜10問`;
+    } else if (mode === "review") {
+      questions = shuffle(bank.filter((q) => questionStat(q.id).needsReview));
+      label = "要復習";
+    } else {
+      questions = shuffle(bank).slice(0, 60);
+      label = "模擬試験｜60問";
+    }
+
+    if (!questions.length) {
+      renderEmptyReview();
+      return;
+    }
+
+    session = {
+      mode,
+      label,
+      questions,
+      index: 0,
+      selected: {},
+      revealed: {},
+      timeLeft: mode === "mock" ? 60 * 60 : null,
+      timerId: null,
+    };
+
+    if (mode === "mock") startTimer();
+    renderQuestion();
+  }
+
+  function renderEmptyReview() {
+    app.innerHTML = `
+      <section class="empty-card">
+        <span class="eyebrow">REVIEW</span>
+        <h1>要復習の問題はありません</h1>
+        <p class="lead" style="margin-inline:auto">まずはランダム10問か章別学習を進めましょう。間違えた問題は、自動でここに入ります。</p>
+        <button class="primary-button" id="emptyStart">ランダム10問を始める</button>
+      </section>`;
+    document.getElementById("emptyStart").addEventListener("click", () => startSession("quick"));
+  }
+
+  function startTimer() {
+    stopTimer();
+    session.timerId = window.setInterval(() => {
+      session.timeLeft -= 1;
+      const timer = document.getElementById("timer");
+      if (timer) {
+        timer.textContent = formatTime(session.timeLeft);
+        timer.classList.toggle("warning", session.timeLeft <= 300);
+      }
+      if (session.timeLeft <= 0) finishMock();
+    }, 1000);
+  }
+
+  function formatTime(seconds) {
+    const min = Math.max(0, Math.floor(seconds / 60));
+    const sec = Math.max(0, seconds % 60);
+    return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  }
+
+  function renderQuestion() {
+    if (!session) return;
+    const q = session.questions[session.index];
+    const selected = session.selected[q.id];
+    const revealed = Boolean(session.revealed[q.id]);
+    const isMock = session.mode === "mock";
+    const stat = questionStat(q.id);
+    const progress = ((session.index + 1) / session.questions.length) * 100;
+
+    app.innerHTML = `
+      <section class="quiz-shell">
+        <div class="quiz-toolbar">
+          <div><span class="eyebrow">${isMock ? "MOCK EXAM" : "PRACTICE"}</span><div class="quiz-status">${escapeHtml(session.label)}　${session.index + 1} / ${session.questions.length}</div></div>
+          ${isMock ? `<div class="timer${session.timeLeft <= 300 ? " warning" : ""}" id="timer" aria-label="残り時間">${formatTime(session.timeLeft)}</div>` : ""}
+        </div>
+        <div class="progress-track" aria-hidden="true"><i style="width:${progress}%"></i></div>
+
+        <article class="question-card">
+          <div class="question-meta">
+            <span class="tag chapter">${escapeHtml(q.chapter)}</span>
+            <span class="tag">${escapeHtml(q.section)}</span>
+            <span class="tag">${escapeHtml(q.difficulty)}</span>
+            <span class="tag">${escapeHtml(q.id)}</span>
+          </div>
+          <div class="question-text">${escapeHtml(q.question)}</div>
+          <div class="choices" role="radiogroup" aria-label="選択肢">
+            ${q.choices.map((choice, index) => {
+              const number = index + 1;
+              let className = "choice";
+              if (selected === number) className += " selected";
+              if (revealed && number === q.answer) className += " correct";
+              if (revealed && selected === number && number !== q.answer) className += " wrong";
+              return `<button class="${className}" type="button" role="radio" aria-checked="${selected === number}" data-choice="${number}" ${revealed ? "disabled" : ""}>
+                <span class="choice-number">${number}</span><span>${escapeHtml(choice)}</span>
+              </button>`;
+            }).join("")}
+          </div>
+
+          ${revealed ? renderExplanation(q, selected) : ""}
+        </article>
+
+        <div class="quiz-actions">
+          <button class="secondary-button${stat.needsReview ? " active" : ""}" id="reviewToggle" type="button">${stat.needsReview ? "★ 要復習に登録済み" : "☆ 要復習に入れる"}</button>
+          <div class="action-right">
+            ${isMock && session.index > 0 ? `<button class="secondary-button" id="prevButton" type="button">前の問題</button>` : ""}
+            ${isMock
+              ? `<button class="primary-button" id="mockNext" type="button">${session.index === session.questions.length - 1 ? "採点する" : "次の問題"}</button>`
+              : revealed
+                ? `<button class="primary-button" id="nextButton" type="button">${session.index === session.questions.length - 1 ? "結果を見る" : "次の問題"}</button>`
+                : `<button class="primary-button" id="answerButton" type="button" ${selected ? "" : "disabled"}>回答する</button>`}
+          </div>
+        </div>
+      </section>
+    `;
+
+    app.querySelectorAll("[data-choice]").forEach((button) => {
+      button.addEventListener("click", () => selectChoice(Number(button.dataset.choice)));
+    });
+    document.getElementById("reviewToggle").addEventListener("click", () => toggleReview(q.id));
+
+    if (isMock) {
+      const prev = document.getElementById("prevButton");
+      if (prev) prev.addEventListener("click", () => moveMock(-1));
+      document.getElementById("mockNext").addEventListener("click", () => {
+        if (session.index === session.questions.length - 1) finishMock();
+        else moveMock(1);
+      });
+    } else if (revealed) {
+      document.getElementById("nextButton").addEventListener("click", nextPractice);
+    } else {
+      document.getElementById("answerButton").addEventListener("click", answerPractice);
+    }
+    app.focus({ preventScroll: true });
+  }
+
+  function renderExplanation(q, selected) {
+    const correct = selected === q.answer;
+    const source = safeUrl(q.sourceUrl);
+    return `<div class="answer-panel${correct ? "" : " incorrect"}" aria-live="polite">
+      <h3>${correct ? "正解です" : `不正解｜正解は ${q.answer}`}</h3>
+      <p>${escapeHtml(q.explanation)}</p>
+      ${source !== "#" ? `<a class="source-link" href="${escapeHtml(source)}" target="_blank" rel="noopener noreferrer">根拠を確認：${escapeHtml(q.sourceName)} ↗</a>` : ""}
+      <span class="source-note">${escapeHtml(q.evidenceType)}${q.reviewedAt ? ` ／ 参照日 ${escapeHtml(q.reviewedAt)}` : ""}</span>
+    </div>`;
+  }
+
+  function selectChoice(number) {
+    if (!session) return;
+    const q = session.questions[session.index];
+    if (session.revealed[q.id]) return;
+    session.selected[q.id] = number;
+    renderQuestion();
+  }
+
+  function answerPractice() {
+    const q = session.questions[session.index];
+    const selected = session.selected[q.id];
+    if (!selected || session.revealed[q.id]) return;
+    const correct = selected === q.answer;
+    const previous = questionStat(q.id);
+    state.stats[q.id] = {
+      ...previous,
+      attempts: (previous.attempts || 0) + 1,
+      correct: (previous.correct || 0) + (correct ? 1 : 0),
+      needsReview: correct ? Boolean(previous.manualReview) : true,
+      lastAnswered: new Date().toISOString(),
+    };
+    session.revealed[q.id] = true;
+    saveState();
+    renderQuestion();
+  }
+
+  function toggleReview(id) {
+    const previous = questionStat(id);
+    const next = !previous.needsReview;
+    state.stats[id] = { ...previous, needsReview: next, manualReview: next };
+    saveState();
+    renderQuestion();
+  }
+
+  function nextPractice() {
+    if (session.index >= session.questions.length - 1) {
+      renderPracticeResult();
+      return;
+    }
+    session.index += 1;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    renderQuestion();
+  }
+
+  function moveMock(amount) {
+    session.index = Math.min(session.questions.length - 1, Math.max(0, session.index + amount));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    renderQuestion();
+  }
+
+  function renderPracticeResult() {
+    const results = session.questions.map((q) => ({ q, selected: session.selected[q.id], correct: session.selected[q.id] === q.answer }));
+    const correctCount = results.filter((item) => item.correct).length;
+    renderResult(results, correctCount, "トレーニング完了");
+  }
+
+  function finishMock() {
+    if (!session || session.mode !== "mock") return;
+    stopTimer();
+    const results = session.questions.map((q) => ({ q, selected: session.selected[q.id], correct: session.selected[q.id] === q.answer }));
+    const correctCount = results.filter((item) => item.correct).length;
+
+    results.forEach(({ q, correct }) => {
+      const previous = questionStat(q.id);
+      state.stats[q.id] = {
+        ...previous,
+        attempts: (previous.attempts || 0) + 1,
+        correct: (previous.correct || 0) + (correct ? 1 : 0),
+        needsReview: correct ? Boolean(previous.manualReview) : true,
+        lastAnswered: new Date().toISOString(),
+      };
+    });
+    state.mockHistory = [...(state.mockHistory || []), { date: new Date().toISOString(), score: correctCount, total: results.length }].slice(-20);
+    saveState();
+    renderResult(results, correctCount, "模擬試験終了");
+  }
+
+  function renderResult(results, correctCount, title) {
+    const rate = Math.round((correctCount / results.length) * 100);
+    const wrongQuestions = results.filter((item) => !item.correct).map((item) => item.q);
+    app.innerHTML = `
+      <section class="result-wrap">
+        <div class="result-hero">
+          <span class="eyebrow">RESULT</span>
+          <h1>${escapeHtml(title)}</h1>
+          <div class="score-ring" style="--score:${rate}%"><strong>${rate}<small>%</small></strong></div>
+          <p>${results.length}問中 ${correctCount}問正解${wrongQuestions.length ? `。間違えた${wrongQuestions.length}問は「要復習」に追加しました。` : "。全問正解です。"}</p>
+          <div class="result-actions">
+            ${wrongQuestions.length ? `<button class="primary-button" id="retryWrong" type="button">間違えた問題を解き直す</button>` : ""}
+            <button class="secondary-button" id="resultHome" type="button">ホームへ戻る</button>
+          </div>
+        </div>
+        <div class="section-title"><h2>回答一覧</h2><span>${correctCount} / ${results.length}問正解</span></div>
+        <div class="result-list">
+          ${results.map(({ q, selected, correct }) => `<div class="result-row">
+            <b>${escapeHtml(q.id)}</b>
+            <span>${escapeHtml(q.topic || q.section)}</span>
+            <span class="${correct ? "ok" : "ng"}">${correct ? "○ 正解" : `× ${selected ? `選択${selected}` : "未回答"}／正解${q.answer}`}</span>
+          </div>`).join("")}
+        </div>
+      </section>`;
+
+    document.getElementById("resultHome").addEventListener("click", goHome);
+    const retry = document.getElementById("retryWrong");
+    if (retry) retry.addEventListener("click", () => startSession("review", null, shuffle(wrongQuestions)));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  homeButton.addEventListener("click", () => {
+    if (session && session.mode === "mock" && !window.confirm("模擬試験を終了してホームへ戻りますか？")) return;
+    goHome();
+  });
+  settingsButton.addEventListener("click", () => settingsDialog.showModal());
+  resetButton.addEventListener("click", () => {
+    if (!window.confirm("回答履歴と要復習リストをすべて消去します。よろしいですか？")) return;
+    state = defaultState();
+    localStorage.removeItem(storageKey);
+    settingsDialog.close();
+    goHome();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (!session || settingsDialog.open) return;
+    if (["1", "2", "3", "4"].includes(event.key)) {
+      selectChoice(Number(event.key));
+      return;
+    }
+    if (event.key === "Enter" && session.mode !== "mock") {
+      const q = session.questions[session.index];
+      if (session.revealed[q.id]) nextPractice();
+      else answerPractice();
+    }
+  });
+
+  function registerStudyTools() {
+    const context = document.modelContext;
+    if (!context?.registerTool) return;
+    const register = (tool) => {
+      try { void Promise.resolve(context.registerTool(tool)).catch(() => {}); } catch (_) { /* unsupported preview */ }
+    };
+    register({
+      name: "get_study_progress",
+      title: "学習進捗を確認",
+      description: "生成AIパスポート問題集の回答数、正答率、要復習数を確認します。",
+      inputSchema: { type: "object", properties: {}, additionalProperties: false },
+      annotations: { readOnlyHint: true, untrustedContentHint: false },
+      execute() { return { totalQuestions: bank.length, ...totals() }; },
+    });
+    register({
+      name: "start_study_session",
+      title: "学習を開始",
+      description: "ランダム10問、要復習、模擬試験、または指定章の学習を画面で開始します。",
+      inputSchema: {
+        type: "object",
+        properties: {
+          mode: { type: "string", enum: ["quick", "review", "mock", "chapter"] },
+          chapter: { type: "string", enum: chapters },
+        },
+        required: ["mode"],
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: false, untrustedContentHint: false },
+      execute(input) {
+        if (!input || !["quick", "review", "mock", "chapter"].includes(input.mode)) throw new Error("有効なmodeを指定してください。");
+        if (input.mode === "chapter" && !chapters.includes(input.chapter)) throw new Error("章別学習では有効なchapterが必要です。");
+        startSession(input.mode, input.chapter || null);
+        return { started: true, mode: input.mode, chapter: input.chapter || null, questionCount: session?.questions.length || 0 };
+      },
+    });
+  }
+
+  registerStudyTools();
+
+  if (!bank.length) {
+    app.innerHTML = `<section class="empty-card"><h1>問題データを読み込めませんでした</h1><p>ページを再読み込みしてください。</p></section>`;
+  } else {
+    renderHome();
+  }
+})();
+
+</script>
+  </body>
+</html>
